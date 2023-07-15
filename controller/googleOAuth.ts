@@ -1,8 +1,8 @@
 import myStrategy from "passport-google-oauth20";
 import passport from "passport";
-import { UserEntity } from "../model/AdminEntity/UserEntity";
-import { mainRoles } from "../utils/constants/roles";
+
 import dot from "dotenv";
+import userModel from "../model/userModel";
 dot.config();
 
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -27,19 +27,17 @@ passport.use(
       profile: any,
       callback: any,
     ) => {
-      const checkUser = await UserEntity.findOne({
-        where: { email: profile._json.email },
-      });
+      const checkUser = await userModel.findOne({ email: profile._json.email });
 
       if (checkUser) {
         return callback(null, checkUser);
       } else {
-        const userCreated = await UserEntity.create({
+        const userCreated = await userModel.create({
           email: profile._json.email,
           userName: profile.name.familyName,
           token: "",
           verified: profile._json.email_verified,
-        }).save();
+        });
 
         return callback(null, userCreated);
       }

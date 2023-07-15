@@ -1,5 +1,37 @@
 import { Request, Response, NextFunction } from "express";
-import { iSocialUserData } from "../utils/interfaces/userInterface";
+import { iSocialUser } from "../utils/interfaces/userInterface";
 import mongoose from "mongoose";
 
-interface iSocialUser extends iSocialUserData, mongoose.Document {}
+interface iSocialUserData extends iSocialUser, mongoose.Document {}
+
+const userModel = new mongoose.Schema(
+  {
+    userName: {
+      type: String,
+    },
+    fullName: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    password: {
+      type: String,
+    },
+    token: {
+      type: String,
+    },
+    avatar: {
+      type: String,
+    },
+    avatarID: {
+      type: String,
+    },
+    verified: {
+      type: Boolean,
+    },
+  },
+  { timestamps: true },
+);
+
+export default mongoose.model<iSocialUserData>("users", userModel);

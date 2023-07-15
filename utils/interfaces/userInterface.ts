@@ -23,14 +23,15 @@ export type iRoleData<Type> = {
   [props in keyof Type]?: Type[props];
 };
 
-interface iSocialUser {
-  userName: string;
-  fullName: string;
-  avatar: string;
-  password: string;
-  avatarID: string;
-  verified: boolean;
-  token: boolean;
+export interface iSocialUser {
+  userName?: string;
+  fullName?: string;
+  avatar?: string;
+  password?: string;
+  email?: string;
+  avatarID?: string;
+  verified?: boolean;
+  token?: string;
 }
 
 export type iSocialUserData<Type> = {

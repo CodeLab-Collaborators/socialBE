@@ -5,6 +5,8 @@ import passport from "passport";
 import { mainAppErrorHandler } from "./error/errorDefiner";
 import { HTTP } from "./constants/HTTP";
 import { errorHandler } from "./error/errorHandlers";
+import user from "./router/userRoutes";
+import oAuth from "./router/oAuthRouter";
 
 export const mainApp = (app: Application) => {
   app
@@ -36,9 +38,9 @@ export const mainApp = (app: Application) => {
     .use(passport.session())
 
     // custom auth
-
+    .use("/api/social/user", user)
     //oAuth with google
-
+    .use("/", oAuth)
     .all("*", (req: Request, res: Response, next: NextFunction) => {
       next(
         new mainAppErrorHandler({

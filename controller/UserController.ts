@@ -1,29 +1,30 @@
 import { Request, Response } from "express";
-import { UserEntity } from "../model/AdminEntity/UserEntity";
-import { HTTP } from "../utils/constants/HTTP";
-import { mainAppErrorHandler } from "../utils/error/errorDefiner";
+
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { mainRoles } from "../utils/constants/roles";
 import crypto from "crypto";
 import { resetUserPassword, verifiedUserMail } from "../utils/email";
 import { exchanger } from "../utils/Exchanger";
+import userModel from "../model/userModel";
+import { HTTP } from "../constants/HTTP";
+import { mainAppErrorHandler } from "../error/errorDefiner";
 
 export const getUser = async (
   req: Request,
   res: Response,
 ): Promise<Response> => {
   try {
-    const schools = await UserEntity.find();
+    const users = await userModel.find();
+
     return res.status(HTTP.OK).json({
-      message: "Viewing all schools",
-      data: schools,
+      message: "Viewing all users",
+      data: users,
     });
   } catch (err: any) {
     new mainAppErrorHandler({
-      message: `Unable to view schools for Admin`,
+      message: `Unable to view user`,
       status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
+      name: "view user Error",
       isSuccess: false,
     });
 
@@ -41,21 +42,17 @@ export const getOneUser = async (
   try {
     const { id } = req.params;
 
-    const school = await UserEntity.findOne({
-      where: {
-        id,
-      },
-      relations: ["student", "course", "schoolLevels"],
-    });
+    const user = await userModel.findById(id);
+
     return res.status(HTTP.OK).json({
-      message: "Viewing school detail",
-      data: school,
+      message: "Viewing user detail",
+      data: user,
     });
   } catch (err) {
     new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
+      message: `Unable to view user`,
       status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
+      name: "user detail Error",
       isSuccess: false,
     });
 
@@ -73,17 +70,17 @@ export const deleteUser = async (
   try {
     const { id } = req.params;
 
-    const removedSchool = await UserEntity.delete({ id });
+    const removeUser = await userModel.findByIdAndDelete(id);
 
     return res.status(HTTP.OK).json({
-      message: "school has been delete",
-      data: removedSchool,
+      message: "user has been delete",
+      data: removeUser,
     });
   } catch (err) {
     new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
+      message: `Unable to create user`,
       status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
+      name: "remoev user Error",
       isSuccess: false,
     });
 
@@ -102,24 +99,21 @@ export const updateUser = async (
     const { id } = req.params;
     const { userName } = req.body;
 
-    const school = await UserEntity.findOne({
-      where: {
-        id,
-      },
-    });
-
-    const updateSchoolInfo = await UserEntity.merge(school, { userName });
-    updateSchoolInfo.save();
+    const user = await userModel.findByIdAndUpdate(
+      id,
+      { userName },
+      { new: true },
+    );
 
     return res.status(HTTP.OK).json({
-      message: "Updating school's info",
-      data: updateSchoolInfo,
+      message: "Updating user's info",
+      data: user,
     });
   } catch (err) {
     new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
+      message: `Unable to update user`,
       status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
+      name: "user update Error",
       isSuccess: false,
     });
 
@@ -138,9 +132,7 @@ export const createUser = async (
     const { schoolName, userName, email, password } = req.body;
     const tokenData = crypto.randomBytes(16).toString("hex");
     console.log(tokenData);
-    const checkIfExist = await UserEntity.findOne({
-      where: { email },
-    });
+    const checkIfExist = await userModel.findOne({ email });
 
     if (checkIfExist) {
       return res.status(HTTP.FORBIDDEN).json({
@@ -156,21 +148,21 @@ export const createUser = async (
         });
 
         return res.status(HTTP.BAD_REQUEST).json({
-          message: "PLease enter your choice password",
+          message: "Please enter your choice password",
         });
       } else {
         const slt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(password, slt);
 
-        const admin = await UserEntity.create({
+        const user = await userModel.create({
           userName,
           email,
           password: hash,
           token: tokenData,
           verified: false,
-        }).save();
+        });
 
-        verifiedUserMail(admin)
+        verifiedUserMail(user)
           .then((result) => {
             console.log("message been sent to you: ");
           })
@@ -178,7 +170,7 @@ export const createUser = async (
 
         return res.status(HTTP.CREATED).json({
           message: "Please check your mail to verify your account",
-          data: admin,
+          data: user,
         });
       }
     }
@@ -204,25 +196,25 @@ export const verifyUser = async (
   try {
     const { id, token } = req.params;
 
-    const findAdmin = await UserEntity.findOne({
-      where: { id },
-    });
+    const findUser = await userModel.findOne();
 
-    if (!findAdmin) {
+    if (!findUser) {
       return res.status(HTTP.FORBIDDEN).json({
         message: "This user does not exist",
       });
     } else {
-      if (findAdmin.token !== "" && findAdmin.token === token) {
-        const admin = await UserEntity.merge(findAdmin, {
+      if (findUser.token !== "" && findUser.token === token) {
+        const user = await userModel.findByIdAndUpdate(findUser._id, {
           token: "",
           verified: true,
-        }).save();
+        });
 
         return res.status(HTTP.OK).json({
-          message: "Your account has been verified, you can nnow sign in...!",
-          data: admin,
+          message: "Your account has been verified, you can now sign in...!",
+          data: findUser,
         });
+      } else {
+        return res.status(HTTP.BAD_REQUEST).json({ message: "Error" });
       }
     }
   } catch (err) {
@@ -248,22 +240,24 @@ export const resetMail = async (
     const { id, token } = req.params;
     const { email } = req.body;
 
-    const findAdmin = await UserEntity.findOne({
-      where: { email },
-    });
+    const user = await userModel.findOne({ email });
 
-    if (!findAdmin) {
+    if (!user) {
       return res.status(HTTP.FORBIDDEN).json({
         message: "This user does not exist",
       });
     } else {
-      if (findAdmin.token === "" && findAdmin.verified === true) {
+      if (user.token === "" && user.verified === true) {
         const newToken = crypto.randomBytes(32).toString("hex");
-        const admin = await UserEntity.merge(findAdmin, {
-          token: newToken,
-        }).save();
+        const userMail = await userModel.findByIdAndUpdate(
+          user._id,
+          {
+            token: newToken,
+          },
+          { new: true },
+        );
 
-        resetUserPassword(admin)
+        resetUserPassword(userMail)
           .then((result) => {
             console.log("message been sent to you: ");
           })
@@ -271,8 +265,10 @@ export const resetMail = async (
 
         return res.status(HTTP.OK).json({
           message: "Please check your email to continue",
-          data: admin,
+          data: userMail,
         });
+      } else {
+        return res.status(HTTP.BAD_REQUEST).json({ message: "Error" });
       }
     }
   } catch (err) {
@@ -298,40 +294,46 @@ export const changePassword = async (
     const { id, token } = req.params;
     const { password } = req.body;
 
-    const findAdmin = await UserEntity.findOne({
-      where: { id },
-    });
+    const findUser = await userModel.findById(id);
 
-    if (!findAdmin) {
+    if (!findUser) {
       return res.status(HTTP.FORBIDDEN).json({
         message: "This user does not exist",
       });
     } else {
-      if (findAdmin.token !== "" && findAdmin.token === token) {
+      if (findUser.token !== "" && findUser.token === token) {
         const slt = await bcrypt.genSalt(10);
         const hashed = await bcrypt.hash(password, slt);
 
-        const admin = await UserEntity.merge(findAdmin, {
-          password: hashed,
-          token: "",
-        }).save();
+        const user = await userModel.findByIdAndUpdate(
+          findUser._id,
+          {
+            password: hashed,
+            token: "",
+          },
+          { new: true },
+        );
 
         return res.status(HTTP.OK).json({
           message: "Your password has been changed, you can now sign in",
-          data: admin,
+          data: user,
+        });
+      } else {
+        return res.status(HTTP.FORBIDDEN).json({
+          message: "Error",
         });
       }
     }
   } catch (err) {
     new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
+      message: `Unable to change Password`,
       status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
+      name: "E Error",
       isSuccess: false,
     });
 
     return res.status(HTTP.BAD_REQUEST).json({
-      message: "Error Found",
+      message: "Password error Found",
       data: err,
     });
   }
@@ -344,30 +346,23 @@ export const signin = async (
   try {
     const { email, password } = req.body;
 
-    const findAdmin = await UserEntity.findOne({
-      where: { email },
-    });
+    const findUser = await userModel.findOne({ email });
 
-    if (!findAdmin) {
+    if (!findUser) {
       return res.status(HTTP.FORBIDDEN).json({
         message: "This user does not exist",
       });
     } else {
-      if (findAdmin.token === "" && findAdmin.verified === true) {
-        console.log("check for Password");
-
+      if (findUser.token === "" && findUser.verified === true) {
         const decryptPassword = await bcrypt.compare(
           password,
-          findAdmin.password,
+          findUser?.password!,
         );
 
         if (decryptPassword) {
           const encrypt = jwt.sign(
             {
-              id: findAdmin.id,
-              email: findAdmin.email,
-              userName: findAdmin.userName,
-              verified: findAdmin.verified,
+              id: findUser.id,
             },
             process.env.SIG_SECRET,
             { expiresIn: process.env.SIG_EXPIRES },
@@ -375,22 +370,17 @@ export const signin = async (
 
           const refreshToken = jwt.sign(
             {
-              id: findAdmin.id,
-              email: findAdmin.email,
-              userName: findAdmin.userName,
-              verified: findAdmin.verified,
+              id: findUser.id,
+              email: findUser.email,
+              userName: findUser.userName,
+              verified: findUser.verified,
             },
             "veriedRefreshedUser",
             { expiresIn: "2m" },
           );
 
-          exchanger(process.env.EXCHANGED_PATH, {
-            encrypt,
-            refreshToken,
-          });
-
           return res.status(HTTP.OK).json({
-            message: `Welcome back ${findAdmin.userName}`,
+            message: `Welcome back ${findUser.userName}`,
             data: { encrypt },
           });
         } else {
@@ -426,7 +416,7 @@ export const refreshUserToken = async (req: Request, res: Response) => {
     jwt.verify(
       refresh,
       process.env.REFRESH_SECRET,
-      (err: Error, payload: jwt.JwtPayload) => {
+      (err: Error, payload:any) => {
         if (err) {
           if (err.name === "TokenExpiredError") {
             res.json({
@@ -439,9 +429,6 @@ export const refreshUserToken = async (req: Request, res: Response) => {
           const encrypt = jwt.sign(
             {
               id: payload.id,
-              email: payload.email,
-              password: payload.password,
-              verified: payload.verified,
             },
             process.env.SIG_SECRET,
             { expiresIn: process.env.SIG_EXPIRES },
