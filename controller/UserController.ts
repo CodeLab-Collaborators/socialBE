@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { resetUserPassword, verifiedUserMail } from "../utils/email";
-import { exchanger } from "../utils/Exchanger";
+
 import userModel from "../model/userModel";
 import { HTTP } from "../constants/HTTP";
 import { mainAppErrorHandler } from "../error/errorDefiner";
@@ -200,13 +200,12 @@ export const updateUserImage = async (req: Request, res: Response) => {
   }
 };
 
-
 export const createUser = async (
   req: Request,
   res: Response,
 ): Promise<Response> => {
   try {
-    const { schoolName, userName, email, password } = req.body;
+    const { fullName, userName, email, password } = req.body;
     const tokenData = crypto.randomBytes(16).toString("hex");
     console.log(tokenData);
     const checkIfExist = await userModel.findOne({ email });
@@ -232,6 +231,7 @@ export const createUser = async (
         const hash = await bcrypt.hash(password, slt);
 
         const user = await userModel.create({
+          fullName,
           userName,
           email,
           password: hash,
@@ -251,7 +251,7 @@ export const createUser = async (
         });
       }
     }
-  } catch (err) {
+  } catch (err: any) {
     new mainAppErrorHandler({
       message: `Unable to create school for Admin`,
       status: HTTP.BAD_REQUEST,
@@ -261,7 +261,7 @@ export const createUser = async (
 
     return res.status(HTTP.BAD_REQUEST).json({
       message: "Error Found",
-      data: err.message,
+      data: err,
     });
   }
 };
@@ -273,25 +273,31 @@ export const verifyUser = async (
   try {
     const { id, token } = req.params;
 
-    const findUser = await userModel.findOne();
+    const findUser = await userModel.findById(id);
 
+    console.log(findUser);
     if (!findUser) {
       return res.status(HTTP.FORBIDDEN).json({
         message: "This user does not exist",
       });
     } else {
       if (findUser.token !== "" && findUser.token === token) {
-        const user = await userModel.findByIdAndUpdate(findUser._id, {
-          token: "",
-          verified: true,
-        });
+        const user = await userModel.findByIdAndUpdate(
+          id,
+          {
+            token: "",
+            verified: true,
+          },
+          { new: true },
+        );
+        console.log("user: ", user);
 
         return res.status(HTTP.OK).json({
           message: "Your account has been verified, you can now sign in...!",
-          data: findUser,
+          data: user,
         });
       } else {
-        return res.status(HTTP.BAD_REQUEST).json({ message: "Error" });
+        return res.status(HTTP.ACCEPTED).json({ message: "done" });
       }
     }
   } catch (err) {

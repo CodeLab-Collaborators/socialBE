@@ -11,7 +11,7 @@ const app: Application = express();
 
 mainApp(app);
 
-const server = app.listen(port, () => {
+const server = app.listen(process.env.PORT || port, () => {
   console.log("");
   console.log("server is ready to connect 🚀🚁🚀🚀");
   db();

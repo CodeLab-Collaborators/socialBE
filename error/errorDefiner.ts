@@ -19,7 +19,7 @@ export class mainAppErrorHandler extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
 
     this.name = args.name || "Error";
-    // this.message = args.message;
+    this.message = args.message;
     this.status = args.status;
 
     if (this.isSuccess !== undefined) {

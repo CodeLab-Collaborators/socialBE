@@ -1,7 +1,9 @@
 declare module "*jsonwebtoken";
 declare module "*ejs";
 declare module "*cloudinary";
+declare module "*nodemailer";
 declare module "*multer";
 declare module "*cors";
+declare module "*amqplib/callback_api";
 declare module "*streamifier";
 declare module "*passport-google-oauth20";

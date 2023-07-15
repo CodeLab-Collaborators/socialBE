@@ -15,7 +15,7 @@ const oAuth = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, GOOGLE_REDIRECT);
 
 oAuth.setCredentials({ refresh_token: GOOGLE_REFRESHTOKEN });
 
-const url: string = "http://localhost:3455/api/user";
+const url: string = "http://localhost:3455/api/social/user";
 
 export const verifiedUserMail = async (admin: any) => {
   try {
