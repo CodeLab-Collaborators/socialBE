@@ -10,13 +10,18 @@ import {
   updateUser,
   verifyUser,
   refreshUserToken,
+  updateUserImage,
 } from "../controller/UserController";
+import multer from "multer";
+let uploadData = multer();
 
 const router = express.Router();
 
 router.route("/").get(getUser);
 
 router.route("/:id/get-one").get(getOneUser);
+
+router.route("/:id/image").patch(uploadData.single("avatar"), updateUserImage);
 
 router.route("/:id/update-info").patch(updateUser);
 

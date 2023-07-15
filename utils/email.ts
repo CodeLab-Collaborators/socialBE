@@ -44,7 +44,7 @@ export const verifiedUserMail = async (admin: any) => {
     });
 
     const mailOptions = {
-      from: "School Perfect ❤❤❤ <georgeseo06@gmail.com>",
+      from: "AJ Connect ❤❤❤ <georgeseo06@gmail.com>",
       to: admin.email,
       subject: "Account Verification",
       html: data,
@@ -80,7 +80,7 @@ export const resetUserPassword = async (admin: any) => {
     });
 
     const mailOptions = {
-      from: "School Perfect ❤❤❤ <georgeseo06@gmail.com>",
+      from: "AJ Connect ❤❤❤ <georgeseo06@gmail.com>",
       to: admin?.email,
       subject: "Reset Password",
       html: data,

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-
+import cloudinary from "../utils/cloudinary";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
@@ -8,6 +8,7 @@ import { exchanger } from "../utils/Exchanger";
 import userModel from "../model/userModel";
 import { HTTP } from "../constants/HTTP";
 import { mainAppErrorHandler } from "../error/errorDefiner";
+import streamifier from "streamifier";
 
 export const getUser = async (
   req: Request,
@@ -123,6 +124,82 @@ export const updateUser = async (
     });
   }
 };
+
+export const updateUserImage = async (req: Request, res: Response) => {
+  try {
+    const pixID: any = await userModel.findById(req.params.id);
+    console.log(pixID);
+
+    if (pixID?.avatarID) {
+      await cloudinary.uploader.destroy(pixID.avatarID);
+
+      let streamUpload = async (req: any) => {
+        return new Promise(async (resolve, reject) => {
+          let stream = await cloudinary.uploader.upload_stream(
+            (error, result) => {
+              if (result) {
+                return resolve(result);
+              } else {
+                return reject(error);
+              }
+            },
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const image: any = await streamUpload(req);
+
+      const viewUser = await userModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          avatar: image.secure_url,
+          avatarID: image.public_id,
+        },
+        { new: true },
+      );
+      res.status(200).json({
+        message: "user data updated",
+        data: viewUser,
+      });
+    } else {
+      let streamUpload = async (req: any) => {
+        return new Promise(async (resolve, reject) => {
+          let stream = await cloudinary.uploader.upload_stream(
+            (error, result) => {
+              if (result) {
+                return resolve(result);
+              } else {
+                return reject(error);
+              }
+            },
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const image: any = await streamUpload(req);
+
+      const viewUser = await userModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          avatar: image.secure_url,
+          avatarID: image.public_id,
+        },
+        { new: true },
+      );
+      res.status(200).json({
+        message: "user data updated",
+        data: viewUser,
+      });
+    }
+  } catch (error) {
+    res.status(404).json({ message: error });
+  }
+};
+
 
 export const createUser = async (
   req: Request,

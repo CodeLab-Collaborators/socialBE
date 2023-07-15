@@ -1,7 +1,6 @@
 import passport from "passport";
 import express, { Request, Response } from "express";
 import "../controller/googleOAuth";
-import "../controller/microsoftOAuth";
 
 import jwt from "jsonwebtoken";
 
