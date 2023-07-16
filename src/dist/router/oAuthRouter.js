@@ -31,7 +31,7 @@ router.route("/failure").get((req, res) => {
 router
     .route("/api/with-google/google-auth")
     .get(passport_1.default.authenticate("google", { scope: ["profile", "email"] }));
-router.route("/auth/google/callback").get(passport_1.default.authenticate("google", {
+router.route("/oauth2/redirect/google").get(passport_1.default.authenticate("google", {
     successRedirect: "/success",
     failureRedirect: "/failure",
 }));

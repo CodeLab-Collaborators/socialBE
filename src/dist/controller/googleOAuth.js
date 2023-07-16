@@ -23,7 +23,6 @@ const GOOGLE_SECRET = process.env.GOOGLE_SECRET;
 passport_1.default.use(new GoogleStrategy({
     clientID: GOOGLE_ID,
     clientSecret: GOOGLE_SECRET,
-    // callbackURL: "/auth/google/callback",
     callbackURL: "/oauth2/redirect/google",
     scope: ["profile", "email"],
 }, (accessToken, refreshToken, profile, callback) => __awaiter(void 0, void 0, void 0, function* () {

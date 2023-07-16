@@ -40,7 +40,7 @@ router
   .route("/api/with-google/google-auth")
   .get(passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.route("/auth/google/callback").get(
+router.route("/oauth2/redirect/google").get(
   passport.authenticate("google", {
     successRedirect: "/success",
     failureRedirect: "/failure",

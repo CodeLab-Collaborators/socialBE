@@ -16,7 +16,6 @@ passport.use(
     {
       clientID: GOOGLE_ID,
       clientSecret: GOOGLE_SECRET,
-      // callbackURL: "/auth/google/callback",
       callbackURL: "/oauth2/redirect/google",
       scope: ["profile", "email"],
     },
