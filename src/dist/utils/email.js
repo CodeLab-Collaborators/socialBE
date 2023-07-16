@@ -17,21 +17,27 @@ const googleapis_1 = require("googleapis");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const ejs_1 = __importDefault(require("ejs"));
 const path_1 = __importDefault(require("path"));
-const GOOGLE_SECRET = "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";
-const GOOGLE_ID = "1054310070984-bqesvn0ftgmhcn6p6292jskt91rk4n5e.apps.googleusercontent.com";
-const GOOGLE_REFRESHTOKEN = "1//04dIMtDvNwamFCgYIARAAGAQSNwF-L9IrFJgJO7AzsDu8l4eJ0xQq5VcPSg9TL3sYVHufYPXj-inHC6ApFpP7hvl8goZR32Cd9TY";
+// const GOOGLE_SECRET = "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";
+// const GOOGLE_ID =
+//   "1054310070984-bqesvn0ftgmhcn6p6292jskt91rk4n5e.apps.googleusercontent.com";
+// const GOOGLE_REFRESHTOKEN =
+//   "1//04dIMtDvNwamFCgYIARAAGAQSNwF-L9IrFJgJO7AzsDu8l4eJ0xQq5VcPSg9TL3sYVHufYPXj-inHC6ApFpP7hvl8goZR32Cd9TY";
+// const GOOGLE_REDIRECT = "https://developers.google.com/oauthplayground";
+const GOOGLE_SECRET = "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";
+const GOOGLE_ID = "56883592068-u7a5efehhqtgciohe4ifkcrc16rl11n3.apps.googleusercontent.com";
+const GOOGLE_REFRESHTOKEN = "1//04HHfERxjfWs1CgYIARAAGAQSNwF-L9Ir5w--rSOJ1K0kSg0qgG55Xnmd2Ip_C80aUlzE_ZQoKE-S8QflvDcp0MkrumD9dfO1QPo";
 const GOOGLE_REDIRECT = "https://developers.google.com/oauthplayground";
 const oAuth = new googleapis_1.google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, GOOGLE_REDIRECT);
 oAuth.setCredentials({ refresh_token: GOOGLE_REFRESHTOKEN });
-const url = "http://localhost:3455/api/social/user";
-const verifiedUserMail = (admin) => __awaiter(void 0, void 0, void 0, function* () {
+const url = "https://social-connect-797u.onrender.com/api/social/user";
+const verifiedUserMail = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accessToken = yield oAuth.getAccessToken();
         const transporter = nodemailer_1.default.createTransport({
             service: "gmail",
             auth: {
                 type: "OAuth2",
-                user: "georgeseo06@gmail.com",
+                user: "gotext24@gmail.com",
                 refreshToken: accessToken.token,
                 clientId: GOOGLE_ID,
                 clientSecret: GOOGLE_SECRET,
@@ -40,16 +46,16 @@ const verifiedUserMail = (admin) => __awaiter(void 0, void 0, void 0, function* 
         });
         const buildFile = path_1.default.join(__dirname, "../views/AccountCreated.ejs");
         const data = yield ejs_1.default.renderFile(buildFile, {
-            userName: admin.userName,
-            email: admin.email,
-            id: admin === null || admin === void 0 ? void 0 : admin.id,
-            role: admin.role,
-            token: admin.token,
+            userName: user.userName,
+            email: user.email,
+            id: user === null || user === void 0 ? void 0 : user.id,
+            role: user.role,
+            token: user.token,
             url,
         });
         const mailOptions = {
-            from: "AJ Connect ❤❤❤ <georgeseo06@gmail.com>",
-            to: admin.email,
+            from: "AJ Connect ❤❤❤ <gotext24@gmail.com>",
+            to: user.email,
             subject: "Account Verification",
             html: data,
         };
@@ -60,14 +66,14 @@ const verifiedUserMail = (admin) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.verifiedUserMail = verifiedUserMail;
-const resetUserPassword = (admin) => __awaiter(void 0, void 0, void 0, function* () {
+const resetUserPassword = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accessToken = yield oAuth.getAccessToken();
         const transporter = nodemailer_1.default.createTransport({
             service: "gmail",
             auth: {
                 type: "OAuth2",
-                user: "georgeseo06@gmail.com",
+                user: "gotext24@gmail.com",
                 refreshToken: accessToken.token,
                 clientId: GOOGLE_ID,
                 clientSecret: GOOGLE_SECRET,
@@ -76,14 +82,14 @@ const resetUserPassword = (admin) => __awaiter(void 0, void 0, void 0, function*
         });
         const buildFile = path_1.default.join(__dirname, "../views/passwordReset.ejs");
         const data = yield ejs_1.default.renderFile(buildFile, {
-            userName: admin.userName,
-            id: admin.id,
-            token: admin.token,
+            userName: user.userName,
+            id: user.id,
+            token: user.token,
             url,
         });
         const mailOptions = {
-            from: "AJ Connect ❤❤❤ <georgeseo06@gmail.com>",
-            to: admin === null || admin === void 0 ? void 0 : admin.email,
+            from: "AJ Connect ❤❤❤ <gotext24@gmail.com>",
+            to: user === null || user === void 0 ? void 0 : user.email,
             subject: "Reset Password",
             html: data,
         };

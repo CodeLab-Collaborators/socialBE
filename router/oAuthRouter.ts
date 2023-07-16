@@ -11,7 +11,9 @@ router.route("/ms").get((req, res) => {
   res.status(200).json({ message: "enter" });
 });
 
-router.route("/success").get((req: Request, res: Response) => {
+// https://social-connect-797u.onrender.com/api/with-google/google-auth
+
+https: router.route("/success").get((req: Request, res: Response) => {
   const userData: any = req.user;
 
   const encrypt = jwt.sign(

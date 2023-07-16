@@ -12,7 +12,8 @@ const router = express_1.default.Router();
 router.route("/ms").get((req, res) => {
     res.status(200).json({ message: "enter" });
 });
-router.route("/success").get((req, res) => {
+// https://social-connect-797u.onrender.com/api/with-google/google-auth
+https: router.route("/success").get((req, res) => {
     const userData = req.user;
     const encrypt = jsonwebtoken_1.default.sign({
         id: userData === null || userData === void 0 ? void 0 : userData.id,

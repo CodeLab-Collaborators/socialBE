@@ -20,11 +20,11 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const Github = require("passport-github2").Strategy;
 const GOOGLE_ID = process.env.GOOGLE_ID;
 const GOOGLE_SECRET = process.env.GOOGLE_SECRET;
-console.log(GoogleStrategy);
 passport_1.default.use(new GoogleStrategy({
     clientID: GOOGLE_ID,
     clientSecret: GOOGLE_SECRET,
-    callbackURL: "/auth/google/callback",
+    // callbackURL: "/auth/google/callback",
+    callbackURL: "/oauth2/redirect/google",
     scope: ["profile", "email"],
 }, (accessToken, refreshToken, profile, callback) => __awaiter(void 0, void 0, void 0, function* () {
     const checkUser = yield userModel_1.default.findOne({ email: profile._json.email });

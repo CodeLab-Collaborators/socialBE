@@ -11,14 +11,13 @@ const Github = require("passport-github2").Strategy;
 const GOOGLE_ID = process.env.GOOGLE_ID;
 const GOOGLE_SECRET = process.env.GOOGLE_SECRET;
 
-console.log(GoogleStrategy);
-
 passport.use(
   new GoogleStrategy(
     {
       clientID: GOOGLE_ID,
       clientSecret: GOOGLE_SECRET,
-      callbackURL: "/auth/google/callback",
+      // callbackURL: "/auth/google/callback",
+      callbackURL: "/oauth2/redirect/google",
       scope: ["profile", "email"],
     },
     async (
