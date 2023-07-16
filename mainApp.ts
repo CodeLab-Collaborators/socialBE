@@ -38,7 +38,7 @@ export const mainApp = (app: Application) => {
     .use(passport.session())
 
     // custom auth
-    .use("/api/social/user", user)
+    .use("/api/social/auth", user)
     //oAuth with google
     .use("/", oAuth)
     .all("*", (req: Request, res: Response, next: NextFunction) => {

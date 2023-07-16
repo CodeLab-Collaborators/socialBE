@@ -38,7 +38,7 @@ const mainApp = (app) => {
         .use(passport_1.default.initialize())
         .use(passport_1.default.session())
         // custom auth
-        .use("/api/social/user", userRoutes_1.default)
+        .use("/api/social/auth", userRoutes_1.default)
         //oAuth with google
         .use("/", oAuthRouter_1.default)
         .all("*", (req, res, next) => {
