@@ -36,7 +36,15 @@ export const mainApp = (app: Application) => {
     })
     .use(passport.initialize())
     .use(passport.session())
-
+    .get("/", (req: Request, res: Response) => {
+      try {
+        res.status(HTTP.OK).json({ message: "Loading Entry" });
+      } catch (error) {
+        res.status(HTTP.BAD_GATEWAY).json({
+          message: "Error loading entry",
+        });
+      }
+    })
     // custom auth
     .use("/api/social/auth", user)
     //oAuth with google

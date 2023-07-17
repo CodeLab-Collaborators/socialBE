@@ -37,6 +37,16 @@ const mainApp = (app) => {
     })
         .use(passport_1.default.initialize())
         .use(passport_1.default.session())
+        .get("/", (req, res) => {
+        try {
+            res.status(HTTP_1.HTTP.OK).json({ message: "Loading Entry" });
+        }
+        catch (error) {
+            res.status(HTTP_1.HTTP.BAD_GATEWAY).json({
+                message: "Error loading entry",
+            });
+        }
+    })
         // custom auth
         .use("/api/social/auth", userRoutes_1.default)
         //oAuth with google
