@@ -22,7 +22,9 @@ const oAuth = new google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, GOOGLE_REDIRECT);
 
 oAuth.setCredentials({ refresh_token: GOOGLE_REFRESHTOKEN });
 
-const url: string = "https://social-connect-797u.onrender.com/api/social/user";
+// const url: string = "https://social-connect-797u.onrender.com/api/social/user";
+
+const url: string = "https://aj-connect.vercel.app/api/social/user";
 
 export const verifiedUserMail = async (user: any) => {
   try {
