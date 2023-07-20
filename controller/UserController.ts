@@ -10,6 +10,7 @@ import { HTTP } from "../constants/HTTP";
 import { mainAppErrorHandler } from "../error/errorDefiner";
 import streamifier from "streamifier";
 
+//getting all user 
 export const getUser = async (
   req: Request,
   res: Response,
@@ -121,6 +122,29 @@ export const updateUser = async (
     return res.status(HTTP.BAD_REQUEST).json({
       message: "Error Found",
       data: err,
+    });
+  }
+};
+
+//editing the user profile
+export const editProfile = async (req: Request, res: Response) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: req.body,
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json({
+      message: "Account has been updated",
+      data: user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "an error occured while editing user profile",
     });
   }
 };
