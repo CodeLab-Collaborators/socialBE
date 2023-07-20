@@ -21,7 +21,7 @@ https: router.route("/success").get((req: Request, res: Response) => {
       id: userData?.id,
     },
     process.env.SIG_SECRET,
-    { expiresIn: process.env.SIG_EXPIRES },
+    { expiresIn: process.env.SIG_EXPIRES }
   );
 
   return res.status(HTTP.OK).json({
@@ -44,7 +44,7 @@ router.route("/oauth2/redirect/google").get(
   passport.authenticate("google", {
     successRedirect: "/success",
     failureRedirect: "/failure",
-  }),
+  })
 );
 
 export default router;

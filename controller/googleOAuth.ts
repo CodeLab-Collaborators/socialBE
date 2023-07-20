@@ -6,7 +6,7 @@ import userModel from "../model/userModel";
 dot.config();
 
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const Github = require("passport-github2").Strategy;
+// const Github = require("passport-github2").Strategy;
 
 const GOOGLE_ID = process.env.GOOGLE_ID;
 const GOOGLE_SECRET = process.env.GOOGLE_SECRET;
