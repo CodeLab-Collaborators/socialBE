@@ -23,7 +23,7 @@ passport.use(
       accessToken: any,
       refreshToken: any,
       profile: any,
-      callback: any,
+      callback: any
     ) => {
       const checkUser = await userModel.findOne({ email: profile._json.email });
 
@@ -39,8 +39,8 @@ passport.use(
 
         return callback(null, userCreated);
       }
-    },
-  ),
+    }
+  )
 );
 
 // const GITHUB_ID = process.env.GITHUB_ID;
