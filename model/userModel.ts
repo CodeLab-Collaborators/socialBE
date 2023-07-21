@@ -72,11 +72,8 @@ const userModel = new mongoose.Schema(
     links: {
       type: Array,
     },
-    location: {
-      type: String,
-    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model<iSocialUserData>("users", userModel);
