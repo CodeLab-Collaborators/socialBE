@@ -6,7 +6,7 @@ import userModel from "../model/userModel";
 dot.config();
 
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const Github = require("passport-github2").Strategy;
+// const Github = require("passport-github2").Strategy;
 
 const GOOGLE_ID = process.env.GOOGLE_ID;
 const GOOGLE_SECRET = process.env.GOOGLE_SECRET;
@@ -23,7 +23,7 @@ passport.use(
       accessToken: any,
       refreshToken: any,
       profile: any,
-      callback: any,
+      callback: any
     ) => {
       const checkUser = await userModel.findOne({ email: profile._json.email });
 
@@ -39,8 +39,8 @@ passport.use(
 
         return callback(null, userCreated);
       }
-    },
-  ),
+    }
+  )
 );
 
 // const GITHUB_ID = process.env.GITHUB_ID;

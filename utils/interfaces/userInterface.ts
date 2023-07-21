@@ -33,11 +33,13 @@ export interface iSocialUser {
   avatarID?: string;
   verified?: boolean;
   token?: string;
-  location?: string;
   address?: string;
   placeOfBirth?: string;
   college?: string;
   secondarySchool?: string;
+  bio?: [];
+  links?: string;
+  location?: string;
 }
 
 export type iSocialUserData<Type> = {

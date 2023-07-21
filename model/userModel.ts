@@ -8,6 +8,7 @@ const userModel = new mongoose.Schema(
   {
     userName: {
       type: String,
+      unique: [true, "username already exist"],
     },
 
     fullName: {
@@ -40,6 +41,9 @@ const userModel = new mongoose.Schema(
 
     email: {
       type: String,
+      unique: true,
+      trim: false,
+      lowercase: true,
     },
 
     password: {
@@ -61,8 +65,18 @@ const userModel = new mongoose.Schema(
     verified: {
       type: Boolean,
     },
+    bio: {
+      type: String,
+      default: "At School",
+    },
+    links: {
+      type: Array,
+    },
+    location: {
+      type: String,
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default mongoose.model<iSocialUserData>("users", userModel);
