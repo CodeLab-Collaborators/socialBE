@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+
 import { iSocialUser } from "../utils/interfaces/userInterface";
 import mongoose from "mongoose";
 
@@ -72,6 +72,17 @@ const userModel = new mongoose.Schema(
     links: {
       type: Array,
     },
+
+    location: {
+      type: String,
+    },
+    post:[
+      {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"posts",
+      }
+    ]
+
   },
   { timestamps: true },
 );

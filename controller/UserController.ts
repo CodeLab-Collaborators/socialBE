@@ -13,7 +13,7 @@ import streamifier from "streamifier";
 //getting all user 
 export const getUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const users = await userModel.find();
@@ -37,9 +37,10 @@ export const getUser = async (
   }
 };
 
+//getting a single user
 export const getOneUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id } = req.params;
@@ -65,9 +66,10 @@ export const getOneUser = async (
   }
 };
 
+//deleting a user
 export const deleteUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id } = req.params;
@@ -95,7 +97,7 @@ export const deleteUser = async (
 
 export const updateUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id } = req.params;
@@ -124,6 +126,7 @@ export const updateUser = async (
       },
       { new: true },
       
+
     );
 
     return res.status(HTTP.OK).json({
@@ -185,7 +188,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
               } else {
                 return reject(error);
               }
-            }
+            },
           );
 
           streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -200,7 +203,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
           avatar: image.secure_url,
           avatarID: image.public_id,
         },
-        { new: true }
+        { new: true },
       );
       res.status(200).json({
         message: "user data updated",
@@ -216,7 +219,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
               } else {
                 return reject(error);
               }
-            }
+            },
           );
 
           streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -231,7 +234,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
           avatar: image.secure_url,
           avatarID: image.public_id,
         },
-        { new: true }
+        { new: true },
       );
       res.status(200).json({
         message: "user data updated",
@@ -245,7 +248,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
 
 export const createUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { fullName, userName, email, password } = req.body;
@@ -311,7 +314,7 @@ export const createUser = async (
 
 export const verifyUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id, token } = req.params;
@@ -331,7 +334,7 @@ export const verifyUser = async (
             token: "",
             verified: true,
           },
-          { new: true }
+          { new: true },
         );
         console.log("user: ", user);
 
@@ -360,7 +363,7 @@ export const verifyUser = async (
 
 export const resetMail = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id, token } = req.params;
@@ -380,7 +383,7 @@ export const resetMail = async (
           {
             token: newToken,
           },
-          { new: true }
+          { new: true },
         );
 
         resetUserPassword(userMail)
@@ -414,7 +417,7 @@ export const resetMail = async (
 
 export const changePassword = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id, token } = req.params;
@@ -437,7 +440,7 @@ export const changePassword = async (
             password: hashed,
             token: "",
           },
-          { new: true }
+          { new: true },
         );
 
         return res.status(HTTP.OK).json({
@@ -467,7 +470,7 @@ export const changePassword = async (
 
 export const signin = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { email, password } = req.body;
@@ -482,7 +485,7 @@ export const signin = async (
       if (findUser.token === "" && findUser.verified === true) {
         const decryptPassword = await bcrypt.compare(
           password,
-          findUser?.password!
+          findUser?.password!,
         );
 
         if (decryptPassword) {
@@ -491,7 +494,7 @@ export const signin = async (
               id: findUser.id,
             },
             process.env.SIG_SECRET,
-            { expiresIn: process.env.SIG_EXPIRES }
+            { expiresIn: process.env.SIG_EXPIRES },
           );
 
           const refreshToken = jwt.sign(
@@ -502,7 +505,7 @@ export const signin = async (
               verified: findUser.verified,
             },
             "veriedRefreshedUser",
-            { expiresIn: "2m" }
+            { expiresIn: "2m" },
           );
 
           return res.status(HTTP.OK).json({
@@ -542,7 +545,7 @@ export const refreshUserToken = async (req: Request, res: Response) => {
     jwt.verify(
       refresh,
       process.env.REFRESH_SECRET,
-      (err: Error, payload: any) => {
+      (err: Error, payload:any) => {
         if (err) {
           if (err.name === "TokenExpiredError") {
             res.json({
@@ -557,7 +560,7 @@ export const refreshUserToken = async (req: Request, res: Response) => {
               id: payload.id,
             },
             process.env.SIG_SECRET,
-            { expiresIn: process.env.SIG_EXPIRES }
+            { expiresIn: process.env.SIG_EXPIRES },
           );
           const refreshToken = req.body.refresh;
 
@@ -566,7 +569,7 @@ export const refreshUserToken = async (req: Request, res: Response) => {
             data: { encrypt, refreshToken },
           });
         }
-      }
+      },
     );
   } catch (error) {
     console.log(error);
