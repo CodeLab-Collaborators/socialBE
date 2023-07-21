@@ -35,8 +35,16 @@ export interface iSocialUser {
   bio?: [];
   links?: string;
   location?: string;
+  post:{}[]
 }
 
 export type iSocialUserData<Type> = {
   [props in keyof Type]?: Type[props];
 };
+
+export interface IpostData{
+  user: {}
+  tittle: string;
+  content: string;
+  mediaFile: string;
+} 
