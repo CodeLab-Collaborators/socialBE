@@ -101,12 +101,32 @@ export const updateUser = async (
 ): Promise<Response> => {
   try {
     const { id } = req.params;
-    const { userName } = req.body;
+    const {
+      userName,
+      fullName,
+      location,
+      address,
+      placeOfBirth,
+      college,
+      profession,
+      secondarySchool,
+    } = req.body;
 
     const user = await userModel.findByIdAndUpdate(
       id,
-      { userName },
+      {
+        userName,
+        fullName,
+        location,
+        address,
+        placeOfBirth,
+        college,
+        profession,
+        secondarySchool,
+      },
       { new: true },
+      
+
     );
 
     return res.status(HTTP.OK).json({

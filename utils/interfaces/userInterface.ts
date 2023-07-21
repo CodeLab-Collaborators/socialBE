@@ -27,11 +27,16 @@ export interface iSocialUser {
   userName?: string;
   fullName?: string;
   avatar?: string;
+  profession?: string;
   password?: string;
   email?: string;
   avatarID?: string;
   verified?: boolean;
   token?: string;
+  address?: string;
+  placeOfBirth?: string;
+  college?: string;
+  secondarySchool?: string;
   bio?: [];
   links?: string;
   location?: string;
