@@ -19,7 +19,7 @@ export const getUser = async (
     const users = await userModel.find();
 
     return res.status(HTTP.OK).json({
-      message: "Viewing all users",
+      message: `Viewing all ${users.length} users`,
       data: users,
     });
   } catch (err: any) {
