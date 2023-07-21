@@ -7,11 +7,13 @@ import { HTTP } from "./constants/HTTP";
 import { errorHandler } from "./error/errorHandlers";
 import user from "./router/userRoutes";
 import oAuth from "./router/oAuthRouter";
+import morgan from "morgan"
 
 export const mainApp = (app: Application) => {
   app
     .use(express.json())
     .use(cors())
+    .use(morgan("dev"))
 
     .use(
       cookieSession({
