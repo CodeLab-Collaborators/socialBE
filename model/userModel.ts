@@ -9,24 +9,55 @@ const userModel = new mongoose.Schema(
     userName: {
       type: String,
     },
+
     fullName: {
       type: String,
     },
+
+    location: {
+      type: String,
+    },
+
+    profession: {
+      type: String,
+    },
+
+    placeOfBirth: {
+      type: String,
+    },
+
+    secondarySchool: {
+      type: String,
+    },
+
+    college: {
+      type: String,
+    },
+
+    address: {
+      type: String,
+    },
+
     email: {
       type: String,
     },
+
     password: {
       type: String,
     },
+
     token: {
       type: String,
     },
+
     avatar: {
       type: String,
     },
+
     avatarID: {
       type: String,
     },
+
     verified: {
       type: Boolean,
     },
