@@ -78,7 +78,7 @@ export const deleteUser = async (
 
     return res.status(HTTP.OK).json({
       message: "user has been delete",
-      data: removeUser,
+    
     });
   } catch (err) {
     new mainAppErrorHandler({
