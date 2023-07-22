@@ -95,6 +95,7 @@ export const deleteUser = async (
   }
 };
 
+//editing the user profile
 export const updateUser = async (
   req: Request,
   res: Response,
@@ -154,7 +155,9 @@ export const editProfile = async (req: Request, res: Response) => {
     const user = await userModel.findByIdAndUpdate(
       req.params.id,
       {
-        $set: req.body,
+        $set: {
+          userName:req.body
+        }
       },
       {
         new: true,
@@ -171,6 +174,7 @@ export const editProfile = async (req: Request, res: Response) => {
   }
 };
 
+//updating the user image 
 export const updateUserImage = async (req: Request, res: Response) => {
   try {
     const pixID: any = await userModel.findById(req.params.id);
@@ -246,6 +250,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
   }
 };
 
+//creating a new user
 export const createUser = async (
   req: Request,
   res: Response,
@@ -312,162 +317,7 @@ export const createUser = async (
   }
 };
 
-export const verifyUser = async (
-  req: Request,
-  res: Response,
-): Promise<Response> => {
-  try {
-    const { id, token } = req.params;
-
-    const findUser = await userModel.findById(id);
-
-    console.log(findUser);
-    if (!findUser) {
-      return res.status(HTTP.FORBIDDEN).json({
-        message: "This user does not exist",
-      });
-    } else {
-      if (findUser.token !== "" && findUser.token === token) {
-        const user = await userModel.findByIdAndUpdate(
-          id,
-          {
-            token: "",
-            verified: true,
-          },
-          { new: true },
-        );
-        console.log("user: ", user);
-
-        return res.status(HTTP.OK).json({
-          message: "Your account has been verified, you can now sign in...!",
-          data: user,
-        });
-      } else {
-        return res.status(HTTP.ACCEPTED).json({ message: "done" });
-      }
-    }
-  } catch (err) {
-    new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
-      status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
-      isSuccess: false,
-    });
-
-    return res.status(HTTP.BAD_REQUEST).json({
-      message: "Error Found",
-      data: err,
-    });
-  }
-};
-
-export const resetMail = async (
-  req: Request,
-  res: Response,
-): Promise<Response> => {
-  try {
-    const { id, token } = req.params;
-    const { email } = req.body;
-
-    const user = await userModel.findOne({ email });
-
-    if (!user) {
-      return res.status(HTTP.FORBIDDEN).json({
-        message: "This user does not exist",
-      });
-    } else {
-      if (user.token === "" && user.verified === true) {
-        const newToken = crypto.randomBytes(32).toString("hex");
-        const userMail = await userModel.findByIdAndUpdate(
-          user._id,
-          {
-            token: newToken,
-          },
-          { new: true },
-        );
-
-        resetUserPassword(userMail)
-          .then((result) => {
-            console.log("message been sent to you: ");
-          })
-          .catch((error) => console.log(error));
-
-        return res.status(HTTP.OK).json({
-          message: "Please check your email to continue",
-          data: userMail,
-        });
-      } else {
-        return res.status(HTTP.BAD_REQUEST).json({ message: "Error" });
-      }
-    }
-  } catch (err) {
-    new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
-      status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
-      isSuccess: false,
-    });
-
-    return res.status(HTTP.BAD_REQUEST).json({
-      message: "Error Found",
-      data: err,
-    });
-  }
-};
-
-export const changePassword = async (
-  req: Request,
-  res: Response,
-): Promise<Response> => {
-  try {
-    const { id, token } = req.params;
-    const { password } = req.body;
-
-    const findUser = await userModel.findById(id);
-
-    if (!findUser) {
-      return res.status(HTTP.FORBIDDEN).json({
-        message: "This user does not exist",
-      });
-    } else {
-      if (findUser.token !== "" && findUser.token === token) {
-        const slt = await bcrypt.genSalt(10);
-        const hashed = await bcrypt.hash(password, slt);
-
-        const user = await userModel.findByIdAndUpdate(
-          findUser._id,
-          {
-            password: hashed,
-            token: "",
-          },
-          { new: true },
-        );
-
-        return res.status(HTTP.OK).json({
-          message: "Your password has been changed, you can now sign in",
-          data: user,
-        });
-      } else {
-        return res.status(HTTP.FORBIDDEN).json({
-          message: "Error",
-        });
-      }
-    }
-  } catch (err) {
-    new mainAppErrorHandler({
-      message: `Unable to change Password`,
-      status: HTTP.BAD_REQUEST,
-      name: "E Error",
-      isSuccess: false,
-    });
-
-    return res.status(HTTP.BAD_REQUEST).json({
-      message: "Password error Found",
-      data: err,
-    });
-  }
-};
-
+//sign In
 export const signin = async (
   req: Request,
   res: Response,
@@ -538,6 +388,166 @@ export const signin = async (
   }
 };
 
+//verifying a user
+export const verifyUser = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id, token } = req.params;
+
+    const findUser = await userModel.findById(id);
+
+    console.log(findUser);
+    if (!findUser) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user does not exist",
+      });
+    } else {
+      if (findUser.token !== "" && findUser.token === token) {
+        const user = await userModel.findByIdAndUpdate(
+          id,
+          {
+            token: "",
+            verified: true,
+          },
+          { new: true },
+        );
+        console.log("user: ", user);
+
+        return res.status(HTTP.OK).json({
+          message: "Your account has been verified, you can now sign in...!",
+          data: user,
+        });
+      } else {
+        return res.status(HTTP.ACCEPTED).json({ message: "done" });
+      }
+    }
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to create school for Admin`,
+      status: HTTP.BAD_REQUEST,
+      name: "School creation Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//reset the user mail
+export const resetMail = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id, token } = req.params;
+    const { email } = req.body;
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user does not exist",
+      });
+    } else {
+      if (user.token === "" && user.verified === true) {
+        const newToken = crypto.randomBytes(32).toString("hex");
+        const userMail = await userModel.findByIdAndUpdate(
+          user._id,
+          {
+            token: newToken,
+          },
+          { new: true },
+        );
+
+        resetUserPassword(userMail)
+          .then((result) => {
+            console.log("message been sent to you: ");
+          })
+          .catch((error) => console.log(error));
+
+        return res.status(HTTP.OK).json({
+          message: "Please check your email to continue",
+          data: userMail,
+        });
+      } else {
+        return res.status(HTTP.BAD_REQUEST).json({ message: "Error" });
+      }
+    }
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to create school for Admin`,
+      status: HTTP.BAD_REQUEST,
+      name: "School creation Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//Resting the user password
+export const changePassword = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id, token } = req.params;
+    const { password } = req.body;
+
+    const findUser = await userModel.findById(id);
+
+    if (!findUser) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user does not exist",
+      });
+    } else {
+      if (findUser.token !== "" && findUser.token === token) {
+        const slt = await bcrypt.genSalt(10);
+        const hashed = await bcrypt.hash(password, slt);
+
+        const user = await userModel.findByIdAndUpdate(
+          findUser._id,
+          {
+            password: hashed,
+            token: "",
+          },
+          { new: true },
+        );
+
+        return res.status(HTTP.OK).json({
+          message: "Your password has been changed, you can now sign in",
+          data: user,
+        });
+      } else {
+        return res.status(HTTP.FORBIDDEN).json({
+          message: "Error",
+        });
+      }
+    }
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to change Password`,
+      status: HTTP.BAD_REQUEST,
+      name: "E Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Password error Found",
+      data: err,
+    });
+  }
+};
+
+//Refreshing the user token
 export const refreshUserToken = async (req: Request, res: Response) => {
   try {
     const { refresh } = req.body;
