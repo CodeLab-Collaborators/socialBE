@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 
 interface iSocialUserData extends iSocialUser, mongoose.Document {}
 
-const userModel = new mongoose.Schema(
+const userModel = new mongoose.Schema<iSocialUser>(
   {
     userName: {
       type: String,
@@ -72,9 +72,19 @@ const userModel = new mongoose.Schema(
     links: {
       type: Array,
     },
-
-    location: {
-      type: String,
+    primarySchool: {
+      type:String,
+    },
+    music:[
+      {
+        type:mongoose.Schema.Types.ObjectId,
+      }
+    ],
+    church:{
+      type:String
+    },
+    mosque:{
+    type:String
     },
     post:[
       {

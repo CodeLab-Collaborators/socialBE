@@ -37,10 +37,14 @@ export interface iSocialUser {
   placeOfBirth?: string;
   college?: string;
   secondarySchool?: string;
+  church:string;
+  mosque:string;
   bio?: [];
-  links?: string;
+  links?: string[];
   location?: string;
-  post:{}[]
+  primarySchool?:string;
+  post?:{}[]
+  music?:string[];
 }
 
 export type iSocialUserData<Type> = {
@@ -52,4 +56,5 @@ export interface IpostData{
   tittle: string;
   content: string;
   mediaFile: string;
+  hashtag:{}[];
 } 
