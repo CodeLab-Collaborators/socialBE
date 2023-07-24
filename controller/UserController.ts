@@ -128,8 +128,6 @@ export const updateUser = async (
         bio,
       },
       { new: true },
-      
-
     );
 
     return res.status(HTTP.OK).json({
