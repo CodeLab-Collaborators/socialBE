@@ -12,6 +12,7 @@ router.route("/").get(UserController_1.getUser);
 router.route("/:id/get-one").get(UserController_1.getOneUser);
 router.route("/:id/image").patch(uploadData.single("avatar"), UserController_1.updateUserImage);
 router.route("/:id/update-info").patch(UserController_1.updateUser);
+// router.route("/:id/update-profile").patch(editProfile);
 router.route("/:id/delete-account").delete(UserController_1.deleteUser);
 router.route("/create").post(UserController_1.createUser);
 router.route("/:id/:token/verify").get(UserController_1.verifyUser);

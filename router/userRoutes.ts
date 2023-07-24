@@ -12,6 +12,7 @@ import {
   refreshUserToken,
   updateUserImage,
   editProfile,
+  updateUser,
 } from "../controller/UserController";
 import multer from "multer";
 let uploadData = multer();
@@ -24,9 +25,9 @@ router.route("/:id/get-one").get(getOneUser);
 
 router.route("/:id/image").patch(uploadData.single("avatar"), updateUserImage);
 
-// router.route("/:id/update-info").patch(updateUser);
+router.route("/:id/update-info").patch(updateUser);
 
-router.route("/:id/update-profile").patch(editProfile);
+// router.route("/:id/update-profile").patch(editProfile);
 
 router.route("/:id/delete-account").delete(deleteUser);
 

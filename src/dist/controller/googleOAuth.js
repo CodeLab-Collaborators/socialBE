@@ -17,7 +17,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const userModel_1 = __importDefault(require("../model/userModel"));
 dotenv_1.default.config();
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const Github = require("passport-github2").Strategy;
+// const Github = require("passport-github2").Strategy;
 const GOOGLE_ID = process.env.GOOGLE_ID;
 const GOOGLE_SECRET = process.env.GOOGLE_SECRET;
 passport_1.default.use(new GoogleStrategy({

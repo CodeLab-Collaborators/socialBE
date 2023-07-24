@@ -13,7 +13,6 @@ export const mainApp = (app: Application) => {
   app
     .use(express.json())
     .use(cors({ origin: "*" }))
-
     .use(morgan("dev"))
 
     .use(

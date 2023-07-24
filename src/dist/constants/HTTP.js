@@ -15,4 +15,4 @@ var HTTP;
     HTTP[HTTP["BAD_GATEWAY"] = 502] = "BAD_GATEWAY";
     HTTP[HTTP["TIMEOUT"] = 508] = "TIMEOUT";
     HTTP[HTTP["NETWORK_TIMEOUT"] = 599] = "NETWORK_TIMEOUT";
-})(HTTP = exports.HTTP || (exports.HTTP = {}));
+})(HTTP || (exports.HTTP = HTTP = {}));

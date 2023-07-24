@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshUserToken = exports.signin = exports.changePassword = exports.resetMail = exports.verifyUser = exports.createUser = exports.updateUserImage = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
+exports.refreshUserToken = exports.signin = exports.changePassword = exports.resetMail = exports.verifyUser = exports.createUser = exports.updateUserImage = exports.editProfile = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -22,11 +22,12 @@ const userModel_1 = __importDefault(require("../model/userModel"));
 const HTTP_1 = require("../constants/HTTP");
 const errorDefiner_1 = require("../error/errorDefiner");
 const streamifier_1 = __importDefault(require("streamifier"));
+//getting all user 
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield userModel_1.default.find();
         return res.status(HTTP_1.HTTP.OK).json({
-            message: "Viewing all users",
+            message: `Viewing all ${users.length} users`,
             data: users,
         });
     }
@@ -93,8 +94,18 @@ exports.deleteUser = deleteUser;
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const { userName } = req.body;
-        const user = yield userModel_1.default.findByIdAndUpdate(id, { userName }, { new: true });
+        const { userName, fullName, location, address, placeOfBirth, college, profession, secondarySchool, bio, } = req.body;
+        const user = yield userModel_1.default.findByIdAndUpdate(id, {
+            userName,
+            fullName,
+            location,
+            address,
+            placeOfBirth,
+            college,
+            profession,
+            secondarySchool,
+            bio,
+        }, { new: true });
         return res.status(HTTP_1.HTTP.OK).json({
             message: "Updating user's info",
             data: user,
@@ -114,6 +125,26 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateUser = updateUser;
+//editing the user profile
+const editProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield userModel_1.default.findByIdAndUpdate(req.params.id, {
+            $set: req.body,
+        }, {
+            new: true,
+        });
+        res.status(200).json({
+            message: "Account has been updated",
+            data: user,
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            message: "an error occured while editing user profile",
+        });
+    }
+});
+exports.editProfile = editProfile;
 const updateUserImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const pixID = yield userModel_1.default.findById(req.params.id);

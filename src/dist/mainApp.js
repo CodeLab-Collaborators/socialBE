@@ -13,10 +13,12 @@ const HTTP_1 = require("./constants/HTTP");
 const errorHandlers_1 = require("./error/errorHandlers");
 const userRoutes_1 = __importDefault(require("./router/userRoutes"));
 const oAuthRouter_1 = __importDefault(require("./router/oAuthRouter"));
+const morgan_1 = __importDefault(require("morgan"));
 const mainApp = (app) => {
     app
         .use(express_1.default.json())
-        .use((0, cors_1.default)())
+        .use((0, cors_1.default)({ origin: "*" }))
+        .use((0, morgan_1.default)("dev"))
         .use((0, cookie_session_1.default)({
         name: `${process.env.SESSION_NAME}`,
         keys: [`${process.env.SESSION_KEY}`],

@@ -108,6 +108,7 @@ export const updateUser = async (
       college,
       profession,
       secondarySchool,
+      bio,
     } = req.body;
 
     const user = await userModel.findByIdAndUpdate(
@@ -121,9 +122,9 @@ export const updateUser = async (
         college,
         profession,
         secondarySchool,
+        bio,
       },
       { new: true },
-      
     );
 
     return res.status(HTTP.OK).json({
