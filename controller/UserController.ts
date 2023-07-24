@@ -13,7 +13,7 @@ import streamifier from "streamifier";
 //getting all user 
 export const getUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const users = await userModel.find();
@@ -37,9 +37,10 @@ export const getUser = async (
   }
 };
 
+//getting a single user
 export const getOneUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id } = req.params;
@@ -65,9 +66,10 @@ export const getOneUser = async (
   }
 };
 
+//deleting a user
 export const deleteUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id } = req.params;
@@ -76,7 +78,7 @@ export const deleteUser = async (
 
     return res.status(HTTP.OK).json({
       message: "user has been delete",
-      data: removeUser,
+    
     });
   } catch (err) {
     new mainAppErrorHandler({
@@ -93,18 +95,39 @@ export const deleteUser = async (
   }
 };
 
+//editing the user profile
 export const updateUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { id } = req.params;
-    const { userName } = req.body;
+    const {
+      userName,
+      fullName,
+      location,
+      address,
+      placeOfBirth,
+      college,
+      profession,
+      secondarySchool,
+      bio,
+    } = req.body;
 
     const user = await userModel.findByIdAndUpdate(
       id,
-      { userName },
-      { new: true }
+      {
+        userName,
+        fullName,
+        location,
+        address,
+        placeOfBirth,
+        college,
+        profession,
+        secondarySchool,
+        bio,
+      },
+      { new: true },
     );
 
     return res.status(HTTP.OK).json({
@@ -132,7 +155,9 @@ export const editProfile = async (req: Request, res: Response) => {
     const user = await userModel.findByIdAndUpdate(
       req.params.id,
       {
-        $set: req.body,
+        $set: {
+          userName:req.body
+        }
       },
       {
         new: true,
@@ -149,6 +174,7 @@ export const editProfile = async (req: Request, res: Response) => {
   }
 };
 
+//updating the user image 
 export const updateUserImage = async (req: Request, res: Response) => {
   try {
     const pixID: any = await userModel.findById(req.params.id);
@@ -166,7 +192,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
               } else {
                 return reject(error);
               }
-            }
+            },
           );
 
           streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -181,7 +207,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
           avatar: image.secure_url,
           avatarID: image.public_id,
         },
-        { new: true }
+        { new: true },
       );
       res.status(200).json({
         message: "user data updated",
@@ -197,7 +223,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
               } else {
                 return reject(error);
               }
-            }
+            },
           );
 
           streamifier.createReadStream(req.file.buffer).pipe(stream);
@@ -212,7 +238,7 @@ export const updateUserImage = async (req: Request, res: Response) => {
           avatar: image.secure_url,
           avatarID: image.public_id,
         },
-        { new: true }
+        { new: true },
       );
       res.status(200).json({
         message: "user data updated",
@@ -224,9 +250,10 @@ export const updateUserImage = async (req: Request, res: Response) => {
   }
 };
 
+//creating a new user
 export const createUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { fullName, userName, email, password } = req.body;
@@ -290,165 +317,10 @@ export const createUser = async (
   }
 };
 
-export const verifyUser = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  try {
-    const { id, token } = req.params;
-
-    const findUser = await userModel.findById(id);
-
-    console.log(findUser);
-    if (!findUser) {
-      return res.status(HTTP.FORBIDDEN).json({
-        message: "This user does not exist",
-      });
-    } else {
-      if (findUser.token !== "" && findUser.token === token) {
-        const user = await userModel.findByIdAndUpdate(
-          id,
-          {
-            token: "",
-            verified: true,
-          },
-          { new: true }
-        );
-        console.log("user: ", user);
-
-        return res.status(HTTP.OK).json({
-          message: "Your account has been verified, you can now sign in...!",
-          data: user,
-        });
-      } else {
-        return res.status(HTTP.ACCEPTED).json({ message: "done" });
-      }
-    }
-  } catch (err) {
-    new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
-      status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
-      isSuccess: false,
-    });
-
-    return res.status(HTTP.BAD_REQUEST).json({
-      message: "Error Found",
-      data: err,
-    });
-  }
-};
-
-export const resetMail = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  try {
-    const { id, token } = req.params;
-    const { email } = req.body;
-
-    const user = await userModel.findOne({ email });
-
-    if (!user) {
-      return res.status(HTTP.FORBIDDEN).json({
-        message: "This user does not exist",
-      });
-    } else {
-      if (user.token === "" && user.verified === true) {
-        const newToken = crypto.randomBytes(32).toString("hex");
-        const userMail = await userModel.findByIdAndUpdate(
-          user._id,
-          {
-            token: newToken,
-          },
-          { new: true }
-        );
-
-        resetUserPassword(userMail)
-          .then((result) => {
-            console.log("message been sent to you: ");
-          })
-          .catch((error) => console.log(error));
-
-        return res.status(HTTP.OK).json({
-          message: "Please check your email to continue",
-          data: userMail,
-        });
-      } else {
-        return res.status(HTTP.BAD_REQUEST).json({ message: "Error" });
-      }
-    }
-  } catch (err) {
-    new mainAppErrorHandler({
-      message: `Unable to create school for Admin`,
-      status: HTTP.BAD_REQUEST,
-      name: "School creation Error",
-      isSuccess: false,
-    });
-
-    return res.status(HTTP.BAD_REQUEST).json({
-      message: "Error Found",
-      data: err,
-    });
-  }
-};
-
-export const changePassword = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  try {
-    const { id, token } = req.params;
-    const { password } = req.body;
-
-    const findUser = await userModel.findById(id);
-
-    if (!findUser) {
-      return res.status(HTTP.FORBIDDEN).json({
-        message: "This user does not exist",
-      });
-    } else {
-      if (findUser.token !== "" && findUser.token === token) {
-        const slt = await bcrypt.genSalt(10);
-        const hashed = await bcrypt.hash(password, slt);
-
-        const user = await userModel.findByIdAndUpdate(
-          findUser._id,
-          {
-            password: hashed,
-            token: "",
-          },
-          { new: true }
-        );
-
-        return res.status(HTTP.OK).json({
-          message: "Your password has been changed, you can now sign in",
-          data: user,
-        });
-      } else {
-        return res.status(HTTP.FORBIDDEN).json({
-          message: "Error",
-        });
-      }
-    }
-  } catch (err) {
-    new mainAppErrorHandler({
-      message: `Unable to change Password`,
-      status: HTTP.BAD_REQUEST,
-      name: "E Error",
-      isSuccess: false,
-    });
-
-    return res.status(HTTP.BAD_REQUEST).json({
-      message: "Password error Found",
-      data: err,
-    });
-  }
-};
-
+//sign In
 export const signin = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     const { email, password } = req.body;
@@ -463,7 +335,7 @@ export const signin = async (
       if (findUser.token === "" && findUser.verified === true) {
         const decryptPassword = await bcrypt.compare(
           password,
-          findUser?.password!
+          findUser?.password!,
         );
 
         if (decryptPassword) {
@@ -472,7 +344,7 @@ export const signin = async (
               id: findUser.id,
             },
             process.env.SIG_SECRET,
-            { expiresIn: process.env.SIG_EXPIRES }
+            { expiresIn: process.env.SIG_EXPIRES },
           );
 
           const refreshToken = jwt.sign(
@@ -483,7 +355,7 @@ export const signin = async (
               verified: findUser.verified,
             },
             "veriedRefreshedUser",
-            { expiresIn: "2m" }
+            { expiresIn: "2m" },
           );
 
           return res.status(HTTP.OK).json({
@@ -516,6 +388,166 @@ export const signin = async (
   }
 };
 
+//verifying a user
+export const verifyUser = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id, token } = req.params;
+
+    const findUser = await userModel.findById(id);
+
+    console.log(findUser);
+    if (!findUser) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user does not exist",
+      });
+    } else {
+      if (findUser.token !== "" && findUser.token === token) {
+        const user = await userModel.findByIdAndUpdate(
+          id,
+          {
+            token: "",
+            verified: true,
+          },
+          { new: true },
+        );
+        console.log("user: ", user);
+
+        return res.status(HTTP.OK).json({
+          message: "Your account has been verified, you can now sign in...!",
+          data: user,
+        });
+      } else {
+        return res.status(HTTP.ACCEPTED).json({ message: "done" });
+      }
+    }
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to create school for Admin`,
+      status: HTTP.BAD_REQUEST,
+      name: "School creation Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//reset the user mail
+export const resetMail = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id, token } = req.params;
+    const { email } = req.body;
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user does not exist",
+      });
+    } else {
+      if (user.token === "" && user.verified === true) {
+        const newToken = crypto.randomBytes(32).toString("hex");
+        const userMail = await userModel.findByIdAndUpdate(
+          user._id,
+          {
+            token: newToken,
+          },
+          { new: true },
+        );
+
+        resetUserPassword(userMail)
+          .then((result) => {
+            console.log("message been sent to you: ");
+          })
+          .catch((error) => console.log(error));
+
+        return res.status(HTTP.OK).json({
+          message: "Please check your email to continue",
+          data: userMail,
+        });
+      } else {
+        return res.status(HTTP.BAD_REQUEST).json({ message: "Error" });
+      }
+    }
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to create school for Admin`,
+      status: HTTP.BAD_REQUEST,
+      name: "School creation Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//Resting the user password
+export const changePassword = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id, token } = req.params;
+    const { password } = req.body;
+
+    const findUser = await userModel.findById(id);
+
+    if (!findUser) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user does not exist",
+      });
+    } else {
+      if (findUser.token !== "" && findUser.token === token) {
+        const slt = await bcrypt.genSalt(10);
+        const hashed = await bcrypt.hash(password, slt);
+
+        const user = await userModel.findByIdAndUpdate(
+          findUser._id,
+          {
+            password: hashed,
+            token: "",
+          },
+          { new: true },
+        );
+
+        return res.status(HTTP.OK).json({
+          message: "Your password has been changed, you can now sign in",
+          data: user,
+        });
+      } else {
+        return res.status(HTTP.FORBIDDEN).json({
+          message: "Error",
+        });
+      }
+    }
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to change Password`,
+      status: HTTP.BAD_REQUEST,
+      name: "E Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Password error Found",
+      data: err,
+    });
+  }
+};
+
+//Refreshing the user token
 export const refreshUserToken = async (req: Request, res: Response) => {
   try {
     const { refresh } = req.body;
@@ -523,7 +555,7 @@ export const refreshUserToken = async (req: Request, res: Response) => {
     jwt.verify(
       refresh,
       process.env.REFRESH_SECRET,
-      (err: Error, payload: any) => {
+      (err: Error, payload:any) => {
         if (err) {
           if (err.name === "TokenExpiredError") {
             res.json({
@@ -538,7 +570,7 @@ export const refreshUserToken = async (req: Request, res: Response) => {
               id: payload.id,
             },
             process.env.SIG_SECRET,
-            { expiresIn: process.env.SIG_EXPIRES }
+            { expiresIn: process.env.SIG_EXPIRES },
           );
           const refreshToken = req.body.refresh;
 
@@ -547,7 +579,7 @@ export const refreshUserToken = async (req: Request, res: Response) => {
             data: { encrypt, refreshToken },
           });
         }
-      }
+      },
     );
   } catch (error) {
     console.log(error);

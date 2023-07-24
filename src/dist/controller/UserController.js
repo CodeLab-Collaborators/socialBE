@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshUserToken = exports.signin = exports.changePassword = exports.resetMail = exports.verifyUser = exports.createUser = exports.updateUserImage = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
+exports.refreshUserToken = exports.changePassword = exports.resetMail = exports.verifyUser = exports.signin = exports.createUser = exports.updateUserImage = exports.editProfile = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -22,11 +22,12 @@ const userModel_1 = __importDefault(require("../model/userModel"));
 const HTTP_1 = require("../constants/HTTP");
 const errorDefiner_1 = require("../error/errorDefiner");
 const streamifier_1 = __importDefault(require("streamifier"));
+//getting all user 
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield userModel_1.default.find();
         return res.status(HTTP_1.HTTP.OK).json({
-            message: "Viewing all users",
+            message: `Viewing all ${users.length} users`,
             data: users,
         });
     }
@@ -44,6 +45,7 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getUser = getUser;
+//getting a single user
 const getOneUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
@@ -67,13 +69,13 @@ const getOneUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.getOneUser = getOneUser;
+//deleting a user
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
         const removeUser = yield userModel_1.default.findByIdAndDelete(id);
         return res.status(HTTP_1.HTTP.OK).json({
             message: "user has been delete",
-            data: removeUser,
         });
     }
     catch (err) {
@@ -90,11 +92,22 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.deleteUser = deleteUser;
+//editing the user profile
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const { userName } = req.body;
-        const user = yield userModel_1.default.findByIdAndUpdate(id, { userName }, { new: true });
+        const { userName, fullName, location, address, placeOfBirth, college, profession, secondarySchool, bio, } = req.body;
+        const user = yield userModel_1.default.findByIdAndUpdate(id, {
+            userName,
+            fullName,
+            location,
+            address,
+            placeOfBirth,
+            college,
+            profession,
+            secondarySchool,
+            bio,
+        }, { new: true });
         return res.status(HTTP_1.HTTP.OK).json({
             message: "Updating user's info",
             data: user,
@@ -114,6 +127,29 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateUser = updateUser;
+//editing the user profile
+const editProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield userModel_1.default.findByIdAndUpdate(req.params.id, {
+            $set: {
+                userName: req.body
+            }
+        }, {
+            new: true,
+        });
+        res.status(200).json({
+            message: "Account has been updated",
+            data: user,
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            message: "an error occured while editing user profile",
+        });
+    }
+});
+exports.editProfile = editProfile;
+//updating the user image 
 const updateUserImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const pixID = yield userModel_1.default.findById(req.params.id);
@@ -173,6 +209,7 @@ const updateUserImage = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.updateUserImage = updateUserImage;
+//creating a new user
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fullName, userName, email, password } = req.body;
@@ -233,136 +270,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createUser = createUser;
-const verifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id, token } = req.params;
-        const findUser = yield userModel_1.default.findById(id);
-        console.log(findUser);
-        if (!findUser) {
-            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
-                message: "This user does not exist",
-            });
-        }
-        else {
-            if (findUser.token !== "" && findUser.token === token) {
-                const user = yield userModel_1.default.findByIdAndUpdate(id, {
-                    token: "",
-                    verified: true,
-                }, { new: true });
-                console.log("user: ", user);
-                return res.status(HTTP_1.HTTP.OK).json({
-                    message: "Your account has been verified, you can now sign in...!",
-                    data: user,
-                });
-            }
-            else {
-                return res.status(HTTP_1.HTTP.ACCEPTED).json({ message: "done" });
-            }
-        }
-    }
-    catch (err) {
-        new errorDefiner_1.mainAppErrorHandler({
-            message: `Unable to create school for Admin`,
-            status: HTTP_1.HTTP.BAD_REQUEST,
-            name: "School creation Error",
-            isSuccess: false,
-        });
-        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
-            message: "Error Found",
-            data: err,
-        });
-    }
-});
-exports.verifyUser = verifyUser;
-const resetMail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id, token } = req.params;
-        const { email } = req.body;
-        const user = yield userModel_1.default.findOne({ email });
-        if (!user) {
-            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
-                message: "This user does not exist",
-            });
-        }
-        else {
-            if (user.token === "" && user.verified === true) {
-                const newToken = crypto_1.default.randomBytes(32).toString("hex");
-                const userMail = yield userModel_1.default.findByIdAndUpdate(user._id, {
-                    token: newToken,
-                }, { new: true });
-                (0, email_1.resetUserPassword)(userMail)
-                    .then((result) => {
-                    console.log("message been sent to you: ");
-                })
-                    .catch((error) => console.log(error));
-                return res.status(HTTP_1.HTTP.OK).json({
-                    message: "Please check your email to continue",
-                    data: userMail,
-                });
-            }
-            else {
-                return res.status(HTTP_1.HTTP.BAD_REQUEST).json({ message: "Error" });
-            }
-        }
-    }
-    catch (err) {
-        new errorDefiner_1.mainAppErrorHandler({
-            message: `Unable to create school for Admin`,
-            status: HTTP_1.HTTP.BAD_REQUEST,
-            name: "School creation Error",
-            isSuccess: false,
-        });
-        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
-            message: "Error Found",
-            data: err,
-        });
-    }
-});
-exports.resetMail = resetMail;
-const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id, token } = req.params;
-        const { password } = req.body;
-        const findUser = yield userModel_1.default.findById(id);
-        if (!findUser) {
-            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
-                message: "This user does not exist",
-            });
-        }
-        else {
-            if (findUser.token !== "" && findUser.token === token) {
-                const slt = yield bcrypt_1.default.genSalt(10);
-                const hashed = yield bcrypt_1.default.hash(password, slt);
-                const user = yield userModel_1.default.findByIdAndUpdate(findUser._id, {
-                    password: hashed,
-                    token: "",
-                }, { new: true });
-                return res.status(HTTP_1.HTTP.OK).json({
-                    message: "Your password has been changed, you can now sign in",
-                    data: user,
-                });
-            }
-            else {
-                return res.status(HTTP_1.HTTP.FORBIDDEN).json({
-                    message: "Error",
-                });
-            }
-        }
-    }
-    catch (err) {
-        new errorDefiner_1.mainAppErrorHandler({
-            message: `Unable to change Password`,
-            status: HTTP_1.HTTP.BAD_REQUEST,
-            name: "E Error",
-            isSuccess: false,
-        });
-        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
-            message: "Password error Found",
-            data: err,
-        });
-    }
-});
-exports.changePassword = changePassword;
+//sign In
 const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -417,6 +325,140 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.signin = signin;
+//verifying a user
+const verifyUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, token } = req.params;
+        const findUser = yield userModel_1.default.findById(id);
+        console.log(findUser);
+        if (!findUser) {
+            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
+                message: "This user does not exist",
+            });
+        }
+        else {
+            if (findUser.token !== "" && findUser.token === token) {
+                const user = yield userModel_1.default.findByIdAndUpdate(id, {
+                    token: "",
+                    verified: true,
+                }, { new: true });
+                console.log("user: ", user);
+                return res.status(HTTP_1.HTTP.OK).json({
+                    message: "Your account has been verified, you can now sign in...!",
+                    data: user,
+                });
+            }
+            else {
+                return res.status(HTTP_1.HTTP.ACCEPTED).json({ message: "done" });
+            }
+        }
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to create school for Admin`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "School creation Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.verifyUser = verifyUser;
+//reset the user mail
+const resetMail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, token } = req.params;
+        const { email } = req.body;
+        const user = yield userModel_1.default.findOne({ email });
+        if (!user) {
+            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
+                message: "This user does not exist",
+            });
+        }
+        else {
+            if (user.token === "" && user.verified === true) {
+                const newToken = crypto_1.default.randomBytes(32).toString("hex");
+                const userMail = yield userModel_1.default.findByIdAndUpdate(user._id, {
+                    token: newToken,
+                }, { new: true });
+                (0, email_1.resetUserPassword)(userMail)
+                    .then((result) => {
+                    console.log("message been sent to you: ");
+                })
+                    .catch((error) => console.log(error));
+                return res.status(HTTP_1.HTTP.OK).json({
+                    message: "Please check your email to continue",
+                    data: userMail,
+                });
+            }
+            else {
+                return res.status(HTTP_1.HTTP.BAD_REQUEST).json({ message: "Error" });
+            }
+        }
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to create school for Admin`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "School creation Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.resetMail = resetMail;
+//Resting the user password
+const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, token } = req.params;
+        const { password } = req.body;
+        const findUser = yield userModel_1.default.findById(id);
+        if (!findUser) {
+            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
+                message: "This user does not exist",
+            });
+        }
+        else {
+            if (findUser.token !== "" && findUser.token === token) {
+                const slt = yield bcrypt_1.default.genSalt(10);
+                const hashed = yield bcrypt_1.default.hash(password, slt);
+                const user = yield userModel_1.default.findByIdAndUpdate(findUser._id, {
+                    password: hashed,
+                    token: "",
+                }, { new: true });
+                return res.status(HTTP_1.HTTP.OK).json({
+                    message: "Your password has been changed, you can now sign in",
+                    data: user,
+                });
+            }
+            else {
+                return res.status(HTTP_1.HTTP.FORBIDDEN).json({
+                    message: "Error",
+                });
+            }
+        }
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to change Password`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "E Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Password error Found",
+            data: err,
+        });
+    }
+});
+exports.changePassword = changePassword;
+//Refreshing the user token
 const refreshUserToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { refresh } = req.body;

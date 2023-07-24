@@ -27,16 +27,34 @@ export interface iSocialUser {
   userName?: string;
   fullName?: string;
   avatar?: string;
+  profession?: string;
   password?: string;
   email?: string;
   avatarID?: string;
   verified?: boolean;
   token?: string;
+  address?: string;
+  placeOfBirth?: string;
+  college?: string;
+  secondarySchool?: string;
+  church:string;
+  mosque:string;
   bio?: [];
-  links?: string;
+  links?: string[];
   location?: string;
+  primarySchool?:string;
+  post?:{}[]
+  music?:string[];
 }
 
 export type iSocialUserData<Type> = {
   [props in keyof Type]?: Type[props];
 };
+
+export interface IpostData{
+  user: {}
+  tittle: string;
+  content: string;
+  mediaFile: string;
+  hashtag:{}[];
+} 
