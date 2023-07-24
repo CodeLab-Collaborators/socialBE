@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from "express";
+
 import { iSocialUser } from "../utils/interfaces/userInterface";
 import mongoose from "mongoose";
 
 interface iSocialUserData extends iSocialUser, mongoose.Document {}
 
-const userModel = new mongoose.Schema(
+const userModel = new mongoose.Schema<iSocialUser>(
   {
     userName: {
       type: String,
@@ -72,6 +72,27 @@ const userModel = new mongoose.Schema(
     links: {
       type: Array,
     },
+    primarySchool: {
+      type:String,
+    },
+    music:[
+      {
+        type:mongoose.Schema.Types.ObjectId,
+      }
+    ],
+    church:{
+      type:String
+    },
+    mosque:{
+    type:String
+    },
+    post:[
+      {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"posts",
+      }
+    ]
+
   },
   { timestamps: true },
 );
