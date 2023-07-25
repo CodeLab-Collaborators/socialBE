@@ -2,6 +2,7 @@ import {Request,Response} from "express"
 import postModel from "../model/postModel"
 import { HTTP } from "../constants/HTTP"
 import { mainAppErrorHandler } from "../error/errorDefiner"
+import userModel from "../model/userModel"
 
 
 
@@ -32,7 +33,9 @@ export const getAllPost = async( req:Request,res:Response):Promise<Response>=>{
 
 export const createPost = async(req:Request,res:Response):Promise<Response>=>{
     try {
+        
           const { tittle, content, mediaFile } = req.body;
+          
         if (!req.body) {
             return res.status(HTTP.FORBIDDEN).json({
                 message:"This post can not be created",

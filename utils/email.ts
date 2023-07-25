@@ -24,7 +24,7 @@ oAuth.setCredentials({ refresh_token: GOOGLE_REFRESHTOKEN });
 
 // const url: string = "https://social-connect-797u.onrender.com/api/social/user";
 
-const url: string = "http://localhost:5173/api/social/auth";
+const url: string = `http://localhost:5544/api/social/auth`;
 
 export const verifiedUserMail = async (user: any) => {
   try {
