@@ -1,7 +1,9 @@
 import express,{Router} from "express"
-import { getAllPost } from "../controller/userPost"
+import { createPost, getAllPost } from "../controller/userPost"
 
 const router = Router()
 
-router.route("/allpost").get(getAllPost);
-router
+router.route("/").get(getAllPost);
+router.route("/").post(createPost)
+
+export default router

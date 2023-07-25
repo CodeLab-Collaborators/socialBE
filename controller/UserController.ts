@@ -326,13 +326,31 @@ export const signin = async (
     const { email, password } = req.body;
 
     const findUser = await userModel.findOne({ email });
+    const isValidPassword = await bcrypt.compare(
+      password,
+      findUser?.password!
+    );
 
-    if (!findUser) {
+      if (!findUser ) {
+        return res.status(HTTP.FORBIDDEN).json({
+          message: "This user does not exist",
+        });
+      } 
+
+    if(findUser.verified  !== true) { 
       return res.status(HTTP.FORBIDDEN).json({
-        message: "This user does not exist",
-      });
-    } else {
-      if (findUser.token === "" && findUser.verified === true) {
+        message:"This user is not verified"
+      })
+    }
+
+    if(isValidPassword  ){
+  return res.status(HTTP.OK).json({
+  message:"Creditianls is not authorized"
+})
+    }
+
+    else {
+      if (findUser.verified === true) {
         const decryptPassword = await bcrypt.compare(
           password,
           findUser?.password!,
@@ -360,7 +378,7 @@ export const signin = async (
 
           return res.status(HTTP.OK).json({
             message: `Welcome back ${findUser.userName}`,
-            data: { encrypt },
+            data: findUser,
           });
         } else {
           return res.status(HTTP.FORBIDDEN).json({

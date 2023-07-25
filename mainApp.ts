@@ -1,4 +1,4 @@
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response, request } from "express";
 import cors from "cors";
 import cookieSession from "cookie-session";
 import passport from "passport";
@@ -6,6 +6,7 @@ import { mainAppErrorHandler } from "./error/errorDefiner";
 import { HTTP } from "./constants/HTTP";
 import { errorHandler } from "./error/errorHandlers";
 import user from "./router/userRoutes";
+import userpost from "./router/postRouter"
 import oAuth from "./router/oAuthRouter";
 import morgan from "morgan"
 
@@ -49,6 +50,9 @@ export const mainApp = (app: Application) => {
     })
     // custom auth
     .use("/api/social/auth", user)
+
+    .use("/api/posts", userpost )
+  
     //oAuth with google
     .use("/", oAuth)
     .all("*", (req: Request, res: Response, next: NextFunction) => {
