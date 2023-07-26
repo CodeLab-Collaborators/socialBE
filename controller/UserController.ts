@@ -19,16 +19,14 @@ export const getUser = async (
 
 const token = req.headers.authorization?.split(" ")[1];
 
+//checking for the authorization token
 if (!token) {
   return res.status(HTTP.OK).json({
     message: 'Invalid Token',
   });
 }
 
-
 //const decodedToken = jwt.verify(token, "veriedRefreshedUser");
-
-
     // return res.status(HTTP.OK).json({
     //   success: true,
     //   data: decodedToken
@@ -103,7 +101,7 @@ export const deleteUser = async (
     new mainAppErrorHandler({
       message: `Unable to create user`,
       status: HTTP.BAD_REQUEST,
-      name: "remoev user Error",
+      name: "remove user Error",
       isSuccess: false,
     });
 
@@ -277,7 +275,7 @@ export const createUser = async (
   try {
     const { fullName, userName, email, password } = req.body;
     const tokenData = crypto.randomBytes(16).toString("hex");
-    console.log(tokenData);
+    // console.log(tokenData);
     const checkIfExist = await userModel.findOne({ email });
 
     if (checkIfExist) {

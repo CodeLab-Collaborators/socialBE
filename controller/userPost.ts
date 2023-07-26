@@ -10,11 +10,27 @@ import jwt from "jsonwebtoken"
 
 
 //get all post 
-export const getAllPost = async( req:Request,res:Response):Promise<Response>=>{
+export const getSingleUserPost = async( req:Request,res:Response):Promise<Response>=>{
     try {
-        const posting  = await postModel.find()
+        
+        //get authorization 
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+          return res.status(HTTP.OK).json({
+            message: "Invalid Token",
+          });
+        }
+        //decrypting the token
+        const requestUser = jwt.verify(token, "veriedRefreshedUser");
+
+        //knowing who is the user
+        const user = await userModel.findOne({ email: requestUser.email });
+
+        //getting the post of that particular user
+         const posting = await postModel.find({ user: user!._id });
+
         return res.status(HTTP.OK).json({
-          message: `Gotten all ${posting.length} posts by users`,
+          message: `Gotten all ${posting.length} posts by ${user?.userName}`,
           data: posting
         });
     } catch (error) {
@@ -34,36 +50,37 @@ export const getAllPost = async( req:Request,res:Response):Promise<Response>=>{
 
 export const createPost = async(req:Request,res:Response):Promise<Response>=>{
     try {
+      //get authorization
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        return res.status(HTTP.OK).json({
+          message: "Invalid Token",
+        });
+      }
+      //decrypting the token
+      const requestUser = jwt.verify(token, "veriedRefreshedUser");
+      //tie the post to the user
+      const user = await userModel.findOne({ email: requestUser.email });
 
-        const token = req.headers.authorization?.split(" ")[1];
+      const { tittle, content, mediaFile } = req.body;
 
-        if (!token) {
-          return res.status(HTTP.OK).json({
-            message: "Invalid Token",
-          });
-        }
+      if (!req.body) {
+        return res.status(HTTP.FORBIDDEN).json({
+          message: "This post can not be created",
+        });
+      } else {
+        const creatingPosting = await postModel.create({
+          tittle,
+          content,
+          mediaFile,
+          user: user,
+        });
 
-        const requestUser = jwt.verify(token, "veriedRefreshedUser");
-
-          const { tittle, content, mediaFile } = req.body;
-          
-        if (!req.body) {
-            return res.status(HTTP.FORBIDDEN).json({
-                message:"This post can not be created",
-            })
-        } else {
-            const creatingPosting = await postModel.create({
-              tittle,
-              content,
-              mediaFile,
-              user: requestUser._id,
-            });
-
-            return res.status(HTTP.CREATED).json({
-                message:"your post has been created",
-                data:creatingPosting
-            })
-        }
+        return res.status(HTTP.CREATED).json({
+          message: "your post has been created",
+          data: creatingPosting,
+        });
+      }
     } catch (error) {
         new mainAppErrorHandler({
             message:`unable to create a post`,
@@ -76,4 +93,51 @@ export const createPost = async(req:Request,res:Response):Promise<Response>=>{
             data:error
         })
     }
+}
+
+export const deleteUserPost = async(req:Request,res:Response):Promise<Response>=>{
+    try {
+      //get authorization
+      const token = req.headers.authorization?.split(" ")[1];
+      if (!token) {
+        return res.status(HTTP.OK).json({
+          message: "Invalid Token",
+        });
+      }
+      //decrypting the token
+      const requestUser = jwt.verify(token, "veriedRefreshedUser");
+
+      //knowing who is the user
+      const user = await userModel.findOne({ email: requestUser.email });
+
+      const { ID } = req.params;
+
+      const userPost = await postModel.findById(ID)
+
+      if(user?._id === userPost!.user) {
+        userPost?.deleteOne;
+            return res.json(HTTP.OK).json({
+        message: "Your post have been  successfully deleted",
+        });
+      } else {
+        return res.status(404).json({
+            message:"this action is not allowed"
+        })
+      }
+
+     
+    } catch (error) {
+        new mainAppErrorHandler({
+            message:"Unable to delete te user post",
+            status:HTTP.BAD_REQUEST,
+            name:"remove post error",
+            isSuccess: false,
+        });
+
+        return res.status(HTTP.BAD_REQUEST).json({
+            message:'An error occurred while deleting',
+            data:error
+        })
+    }
+
 }
