@@ -7,7 +7,7 @@ import {
   getOneUser,
   resetMail,
   signin,
-  // updateUser,
+
   verifyUser,
   refreshUserToken,
   updateUserImage,
@@ -27,7 +27,7 @@ router.route("/:id/image").patch(uploadData.single("avatar"), updateUserImage);
 
 router.route("/:id/update-info").patch(updateUser);
 
-// router.route("/:id/update-profile").patch(editProfile);
+
 
 router.route("/:id/delete-account").delete(deleteUser);
 
