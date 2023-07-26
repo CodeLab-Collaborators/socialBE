@@ -27,7 +27,7 @@ const postModel = new mongoose.Schema<IpostData>({
   hashtag: [
     {
       type: Schema.Types.ObjectId,
-      ref: "users",
+      ref: "hashTags",
     },
   ],
 });

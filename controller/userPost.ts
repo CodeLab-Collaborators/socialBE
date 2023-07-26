@@ -82,7 +82,8 @@ export const deleteUserPosts = async (
       await postModel.findByIdAndDelete(postID);
 
       user?.post?.pull(new mongoose.Types.ObjectId(postID));
-user.save()
+      user.save();
+      
       return res.status(HTTP.CREATED).json({
         message: `posts delete`,
       });

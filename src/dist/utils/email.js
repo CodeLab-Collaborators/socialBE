@@ -30,7 +30,7 @@ const GOOGLE_REDIRECT = "https://developers.google.com/oauthplayground";
 const oAuth = new googleapis_1.google.auth.OAuth2(GOOGLE_ID, GOOGLE_SECRET, GOOGLE_REDIRECT);
 oAuth.setCredentials({ refresh_token: GOOGLE_REFRESHTOKEN });
 // const url: string = "https://social-connect-797u.onrender.com/api/social/user";
-const url = "http://localhost:5173/api/social/auth";
+const url = `http://localhost:5544/api/social/auth`;
 const verifiedUserMail = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accessToken = yield oAuth.getAccessToken();

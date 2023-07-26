@@ -62,3 +62,10 @@ export interface IpostData {
   like: string[];
   hashtag: {}[];
 } 
+
+export interface iHash {
+  user: {};
+  title: string;
+  userID: string;
+  post: {};
+} 

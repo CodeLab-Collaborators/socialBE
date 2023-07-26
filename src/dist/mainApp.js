@@ -12,6 +12,7 @@ const errorDefiner_1 = require("./error/errorDefiner");
 const HTTP_1 = require("./constants/HTTP");
 const errorHandlers_1 = require("./error/errorHandlers");
 const userRoutes_1 = __importDefault(require("./router/userRoutes"));
+const postRouter_1 = __importDefault(require("./router/postRouter"));
 const oAuthRouter_1 = __importDefault(require("./router/oAuthRouter"));
 const morgan_1 = __importDefault(require("morgan"));
 const mainApp = (app) => {
@@ -51,6 +52,8 @@ const mainApp = (app) => {
     })
         // custom auth
         .use("/api/social/auth", userRoutes_1.default)
+        // post data router
+        .use("/api/social/post", postRouter_1.default)
         //oAuth with google
         .use("/", oAuthRouter_1.default)
         .all("*", (req, res, next) => {

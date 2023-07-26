@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshUserToken = exports.changePassword = exports.resetMail = exports.verifyUser = exports.signin = exports.createUser = exports.updateUserImage = exports.editProfile = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
+exports.refreshUserToken = exports.changePassword = exports.resetMail = exports.verifyUser = exports.signin = exports.createUser = exports.updateUserCoverImage = exports.updateUserImage = exports.editProfile = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -25,6 +25,17 @@ const streamifier_1 = __importDefault(require("streamifier"));
 //getting all user 
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // const token = req.headers.authorization?.split(" ")[1];
+        // if (!token) {
+        //   return res.status(HTTP.OK).json({
+        //     message: 'Invalid Token',
+        //   });
+        // }
+        //const decodedToken = jwt.verify(token, "veriedRefreshedUser");
+        // return res.status(HTTP.OK).json({
+        //   success: true,
+        //   data: decodedToken
+        // });
         const users = yield userModel_1.default.find();
         return res.status(HTTP_1.HTTP.OK).json({
             message: `Viewing all ${users.length} users`,
@@ -40,7 +51,7 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
         return res.status(HTTP_1.HTTP.OK).json({
             message: "Error Found",
-            data: err,
+            data: err.message,
         });
     }
 });
@@ -132,8 +143,8 @@ const editProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         const user = yield userModel_1.default.findByIdAndUpdate(req.params.id, {
             $set: {
-                userName: req.body
-            }
+                userName: req.body,
+            },
         }, {
             new: true,
         });
@@ -149,7 +160,7 @@ const editProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.editProfile = editProfile;
-//updating the user image 
+//updating the user image
 const updateUserImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const pixID = yield userModel_1.default.findById(req.params.id);
@@ -209,6 +220,66 @@ const updateUserImage = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.updateUserImage = updateUserImage;
+//updating the user cover image
+const updateUserCoverImage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const pixID = yield userModel_1.default.findById(req.params.id);
+        console.log(pixID);
+        if (pixID === null || pixID === void 0 ? void 0 : pixID.avatarID) {
+            yield cloudinary_1.default.uploader.destroy(pixID.avatarID);
+            let streamUpload = (req) => __awaiter(void 0, void 0, void 0, function* () {
+                return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+                    let stream = yield cloudinary_1.default.uploader.upload_stream((error, result) => {
+                        if (result) {
+                            return resolve(result);
+                        }
+                        else {
+                            return reject(error);
+                        }
+                    });
+                    streamifier_1.default.createReadStream(req.file.buffer).pipe(stream);
+                }));
+            });
+            const image = yield streamUpload(req);
+            const viewUser = yield userModel_1.default.findByIdAndUpdate(req.params.id, {
+                coverImage: image.secure_url,
+                coverImageID: image.public_id,
+            }, { new: true });
+            res.status(200).json({
+                message: "user data updated",
+                data: viewUser,
+            });
+        }
+        else {
+            let streamUpload = (req) => __awaiter(void 0, void 0, void 0, function* () {
+                return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+                    let stream = yield cloudinary_1.default.uploader.upload_stream((error, result) => {
+                        if (result) {
+                            return resolve(result);
+                        }
+                        else {
+                            return reject(error);
+                        }
+                    });
+                    streamifier_1.default.createReadStream(req.file.buffer).pipe(stream);
+                }));
+            });
+            const image = yield streamUpload(req);
+            const viewUser = yield userModel_1.default.findByIdAndUpdate(req.params.id, {
+                avatar: image.secure_url,
+                avatarID: image.public_id,
+            }, { new: true });
+            res.status(200).json({
+                message: "user data updated",
+                data: viewUser,
+            });
+        }
+    }
+    catch (error) {
+        res.status(404).json({ message: error });
+    }
+});
+exports.updateUserCoverImage = updateUserCoverImage;
 //creating a new user
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -275,41 +346,50 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
         const findUser = yield userModel_1.default.findOne({ email });
+        const isValidPassword = yield bcrypt_1.default.compare(password, findUser === null || findUser === void 0 ? void 0 : findUser.password);
         if (!findUser) {
             return res.status(HTTP_1.HTTP.FORBIDDEN).json({
                 message: "This user does not exist",
             });
         }
-        else {
-            if (findUser.token === "" && findUser.verified === true) {
-                const decryptPassword = yield bcrypt_1.default.compare(password, findUser === null || findUser === void 0 ? void 0 : findUser.password);
-                if (decryptPassword) {
-                    const encrypt = jsonwebtoken_1.default.sign({
-                        id: findUser.id,
-                    }, process.env.SIG_SECRET, { expiresIn: process.env.SIG_EXPIRES });
-                    const refreshToken = jsonwebtoken_1.default.sign({
-                        id: findUser.id,
-                        email: findUser.email,
-                        userName: findUser.userName,
-                        verified: findUser.verified,
-                    }, "veriedRefreshedUser", { expiresIn: "2m" });
-                    return res.status(HTTP_1.HTTP.OK).json({
-                        message: `Welcome back ${findUser.userName}`,
-                        data: { encrypt },
-                    });
-                }
-                else {
-                    return res.status(HTTP_1.HTTP.FORBIDDEN).json({
-                        message: "Your password isn't correct",
-                    });
-                }
-            }
-            else {
-                return res.status(HTTP_1.HTTP.FORBIDDEN).json({
-                    message: "This Account hasn't been Verified",
-                });
-            }
+        if (!isValidPassword) {
+            return res.status(HTTP_1.HTTP.OK).json({
+                message: "Creditianls is not authorized",
+            });
         }
+        if (findUser.verified !== true) {
+            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
+                message: "This user is not verified",
+            });
+        }
+        const refreshToken = jsonwebtoken_1.default.sign({
+            id: findUser.id,
+            email: findUser.email,
+            userName: findUser.userName,
+            verified: findUser.verified,
+        }, "veriedRefreshedUser", { expiresIn: "2d" });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: `Welcome back ${findUser.userName}`,
+            data: findUser,
+            token: refreshToken,
+        });
+        // const decryptPassword = await bcrypt.compare(
+        //   password,
+        //   findUser?.password!,
+        // );
+        // if (decryptPassword) {
+        //   const encrypt = jwt.sign(
+        //     {
+        //       id: findUser.id,
+        //     },
+        //     process.env.SIG_SECRET,
+        //     { expiresIn: process.env.SIG_EXPIRES },
+        //   );
+        // } else {
+        //   return res.status(HTTP.FORBIDDEN).json({
+        //     message: "This Account hasn't been Verified",
+        //   });
+        // }
     }
     catch (err) {
         new errorDefiner_1.mainAppErrorHandler({
