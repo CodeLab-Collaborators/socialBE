@@ -14,6 +14,15 @@ const postModel = new mongoose.Schema<IpostData>({
   mediaFile: {
     type: String,
   },
+
+  user: 
+    {
+    type: Schema.Types.ObjectId,
+    ref: "users",
+  }
+,
+  hashtag:[
+
   mediaFileID: {
     type: String,
   },
@@ -25,6 +34,7 @@ const postModel = new mongoose.Schema<IpostData>({
     ref: "users",
   },
   hashtag: [
+
     {
       type: Schema.Types.ObjectId,
       ref: "hashTags",

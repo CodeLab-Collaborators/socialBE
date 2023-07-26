@@ -1,4 +1,5 @@
 import express,{Router} from "express"
+
 import {
   createPost,
   deleteUserPosts,
@@ -10,7 +11,9 @@ import {
 import multer from "multer";
 let uploadData = multer();
 
+
 const router = Router();
+
 
 router.route("/get-posts").get(getAllPost);
 
