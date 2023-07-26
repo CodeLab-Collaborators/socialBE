@@ -16,12 +16,31 @@ export const getUser = async (
   res: Response,
 ): Promise<Response> => {
   try {
-    const users = await userModel.find();
+
+const token = req.headers.authorization?.split(" ")[1];
+
+if (!token) {
+  return res.status(HTTP.OK).json({
+    message: 'Invalid Token',
+  });
+}
+
+
+//const decodedToken = jwt.verify(token, "veriedRefreshedUser");
+
+
+    // return res.status(HTTP.OK).json({
+    //   success: true,
+    //   data: decodedToken
+    // });
+
+const users = await userModel.find();
 
     return res.status(HTTP.OK).json({
       message: `Viewing all ${users.length} users`,
       data: users,
     });
+
   } catch (err: any) {
     new mainAppErrorHandler({
       message: `Unable to view user`,
@@ -325,7 +344,7 @@ export const signin = async (
   try {
     const { email, password } = req.body;
 
-    const findUser = await userModel.findOne({ email });
+    const findUser = await userModel.findOne({ email });  
     const isValidPassword = await bcrypt.compare(
       password,
       findUser?.password!
@@ -336,35 +355,18 @@ export const signin = async (
           message: "This user does not exist",
         });
       } 
+         if (!isValidPassword) {
+           return res.status(HTTP.OK).json({
+             message: "Creditianls is not authorized",
+           });
+         }
 
-    if(findUser.verified  !== true) { 
+    if(findUser.verified !== true) { 
       return res.status(HTTP.FORBIDDEN).json({
-        message:"This user is not verified"
+        message:"This user is not verified",
       })
     }
-
-    if(isValidPassword  ){
-  return res.status(HTTP.OK).json({
-  message:"Creditianls is not authorized"
-})
-    }
-
-    else {
-      if (findUser.verified === true) {
-        const decryptPassword = await bcrypt.compare(
-          password,
-          findUser?.password!,
-        );
-
-        if (decryptPassword) {
-          const encrypt = jwt.sign(
-            {
-              id: findUser.id,
-            },
-            process.env.SIG_SECRET,
-            { expiresIn: process.env.SIG_EXPIRES },
-          );
-
+ 
           const refreshToken = jwt.sign(
             {
               id: findUser.id,
@@ -379,18 +381,28 @@ export const signin = async (
           return res.status(HTTP.OK).json({
             message: `Welcome back ${findUser.userName}`,
             data: findUser,
-          });
-        } else {
-          return res.status(HTTP.FORBIDDEN).json({
-            message: "Your password isn't correct",
-          });
-        }
-      } else {
-        return res.status(HTTP.FORBIDDEN).json({
-          message: "This Account hasn't been Verified",
-        });
-      }
-    }
+            token: refreshToken
+          })
+            // const decryptPassword = await bcrypt.compare(
+        //   password,
+        //   findUser?.password!,
+        // );
+
+        // if (decryptPassword) {
+        //   const encrypt = jwt.sign(
+        //     {
+        //       id: findUser.id,
+        //     },
+        //     process.env.SIG_SECRET,
+        //     { expiresIn: process.env.SIG_EXPIRES },
+        //   );
+
+
+      // } else {
+      //   return res.status(HTTP.FORBIDDEN).json({
+      //     message: "This Account hasn't been Verified",
+      //   });
+      // }
   } catch (err) {
     new mainAppErrorHandler({
       message: `Unable to create school for Admin`,

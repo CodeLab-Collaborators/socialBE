@@ -3,6 +3,7 @@ import postModel from "../model/postModel"
 import { HTTP } from "../constants/HTTP"
 import { mainAppErrorHandler } from "../error/errorDefiner"
 import userModel from "../model/userModel"
+import jwt from "jsonwebtoken"
 
 
 
@@ -33,7 +34,17 @@ export const getAllPost = async( req:Request,res:Response):Promise<Response>=>{
 
 export const createPost = async(req:Request,res:Response):Promise<Response>=>{
     try {
-        
+
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if (!token) {
+          return res.status(HTTP.OK).json({
+            message: "Invalid Token",
+          });
+        }
+
+        const requestUser = jwt.verify(token, "veriedRefreshedUser");
+
           const { tittle, content, mediaFile } = req.body;
           
         if (!req.body) {
@@ -45,6 +56,7 @@ export const createPost = async(req:Request,res:Response):Promise<Response>=>{
               tittle,
               content,
               mediaFile,
+              user: requestUser._id,
             });
 
             return res.status(HTTP.CREATED).json({
