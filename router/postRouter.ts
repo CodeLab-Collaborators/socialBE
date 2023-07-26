@@ -1,11 +1,33 @@
 import express,{Router} from "express"
-import { createPost, deleteUserPost, getSingleUserPost } from "../controller/userPost"
 
-const router = Router()
+import {
+  createPost,
+  deleteUserPosts,
+  getAllPost,
+  getUserPosts,
+  likeUserPosts,
+  unLikeUserPosts,
+} from "../controller/userPost";
+import multer from "multer";
+let uploadData = multer();
 
-router.route("/").get(getSingleUserPost);
-router.route("/").post(createPost)
-router.route("/:ID/delelepost").delete(deleteUserPost)
 
+const router = Router();
+
+
+router.route("/get-posts").get(getAllPost);
+
+router.route("/:userID/get-post").get(getUserPosts);
+
+router.route("/:userID/:postID/delete-post").delete(deleteUserPosts);
+
+router
+  .route("/:userID/make-post")
+  .post(uploadData.single("avatar"), createPost);
+
+// like session
+router.route("/:userID/:postID/unlike-post").post(unLikeUserPosts);
+
+router.route("/:userID/:postID/like-post").post(likeUserPosts);
 
 export default router

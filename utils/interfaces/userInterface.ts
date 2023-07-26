@@ -27,6 +27,8 @@ export interface iSocialUser {
   userName?: string;
   fullName?: string;
   avatar?: string;
+  coverImage?: string;
+  coverImageID?: string;
   profession?: string;
   password?: string;
   email?: string;
@@ -37,24 +39,33 @@ export interface iSocialUser {
   placeOfBirth?: string;
   college?: string;
   secondarySchool?: string;
-  church:string;
-  mosque:string;
+  church: string;
+  mosque: string;
   bio?: [];
   links?: string[];
   location?: string;
-  primarySchool?:string;
-  post?:{}[]
-  music?:string[];
+  primarySchool?: string;
+  post?: {}[];
+  music?: string[];
 }
 
 export type iSocialUserData<Type> = {
   [props in keyof Type]?: Type[props];
 };
 
-export interface IpostData{
-  user: {}
-  tittle: string;
-  content: string;
+export interface IpostData {
+  user: {};
+  post: string;
+  userID: string;
   mediaFile: string;
-  hashtag:{}[];
+  mediaFileID: string;
+  like: string[];
+  hashtag: {}[];
+} 
+
+export interface iHash {
+  user: {};
+  title: string;
+  userID: string;
+  post: {};
 } 

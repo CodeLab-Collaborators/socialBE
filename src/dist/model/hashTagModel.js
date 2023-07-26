@@ -24,31 +24,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const postModel = new mongoose_1.default.Schema({
-    post: {
+const hashTagModel = new mongoose_1.default.Schema({
+    title: {
         type: String,
     },
     userID: {
         type: String,
     },
-    mediaFile: {
-        type: String,
-    },
-    mediaFileID: {
-        type: String,
-    },
-    like: {
-        type: [],
-    },
-    user: {
+    user: {},
+    post: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "users",
+        ref: "posts",
     },
-    hashtag: [
-        {
-            type: mongoose_1.Schema.Types.ObjectId,
-            ref: "hashTags",
-        },
-    ],
 });
-exports.default = mongoose_1.default.model("posts", postModel);
+exports.default = mongoose_1.default.model("hashTags", hashTagModel);

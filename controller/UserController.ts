@@ -16,6 +16,8 @@ export const getUser = async (
   res: Response,
 ): Promise<Response> => {
   try {
+    // const token = req.headers.authorization?.split(" ")[1];
+
 
 const token = req.headers.authorization?.split(" ")[1];
 
@@ -27,18 +29,27 @@ if (!token) {
 }
 
 //const decodedToken = jwt.verify(token, "veriedRefreshedUser");
+
+    // if (!token) {
+    //   return res.status(HTTP.OK).json({
+    //     message: 'Invalid Token',
+    //   });
+    // }
+
+    //const decodedToken = jwt.verify(token, "veriedRefreshedUser");
+
+
     // return res.status(HTTP.OK).json({
     //   success: true,
     //   data: decodedToken
     // });
 
-const users = await userModel.find();
+    const users = await userModel.find();
 
     return res.status(HTTP.OK).json({
       message: `Viewing all ${users.length} users`,
       data: users,
     });
-
   } catch (err: any) {
     new mainAppErrorHandler({
       message: `Unable to view user`,
@@ -49,7 +60,7 @@ const users = await userModel.find();
 
     return res.status(HTTP.OK).json({
       message: "Error Found",
-      data: err,
+      data: err.message,
     });
   }
 };
@@ -95,7 +106,6 @@ export const deleteUser = async (
 
     return res.status(HTTP.OK).json({
       message: "user has been delete",
-    
     });
   } catch (err) {
     new mainAppErrorHandler({
@@ -173,12 +183,12 @@ export const editProfile = async (req: Request, res: Response) => {
       req.params.id,
       {
         $set: {
-          userName:req.body
-        }
+          userName: req.body,
+        },
       },
       {
         new: true,
-      }
+      },
     );
     res.status(200).json({
       message: "Account has been updated",
@@ -191,7 +201,7 @@ export const editProfile = async (req: Request, res: Response) => {
   }
 };
 
-//updating the user image 
+//updating the user image
 export const updateUserImage = async (req: Request, res: Response) => {
   try {
     const pixID: any = await userModel.findById(req.params.id);
@@ -223,6 +233,82 @@ export const updateUserImage = async (req: Request, res: Response) => {
         {
           avatar: image.secure_url,
           avatarID: image.public_id,
+        },
+        { new: true },
+      );
+      res.status(200).json({
+        message: "user data updated",
+        data: viewUser,
+      });
+    } else {
+      let streamUpload = async (req: any) => {
+        return new Promise(async (resolve, reject) => {
+          let stream = await cloudinary.uploader.upload_stream(
+            (error, result) => {
+              if (result) {
+                return resolve(result);
+              } else {
+                return reject(error);
+              }
+            },
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const image: any = await streamUpload(req);
+
+      const viewUser = await userModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          avatar: image.secure_url,
+          avatarID: image.public_id,
+        },
+        { new: true },
+      );
+      res.status(200).json({
+        message: "user data updated",
+        data: viewUser,
+      });
+    }
+  } catch (error) {
+    res.status(404).json({ message: error });
+  }
+};
+
+//updating the user cover image
+export const updateUserCoverImage = async (req: Request, res: Response) => {
+  try {
+    const pixID: any = await userModel.findById(req.params.id);
+    console.log(pixID);
+
+    if (pixID?.avatarID) {
+      await cloudinary.uploader.destroy(pixID.avatarID);
+
+      let streamUpload = async (req: any) => {
+        return new Promise(async (resolve, reject) => {
+          let stream = await cloudinary.uploader.upload_stream(
+            (error, result) => {
+              if (result) {
+                return resolve(result);
+              } else {
+                return reject(error);
+              }
+            },
+          );
+
+          streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+      };
+
+      const image: any = await streamUpload(req);
+
+      const viewUser = await userModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          coverImage: image.secure_url,
+          coverImageID: image.public_id,
         },
         { new: true },
       );
@@ -342,65 +428,61 @@ export const signin = async (
   try {
     const { email, password } = req.body;
 
-    const findUser = await userModel.findOne({ email });  
-    const isValidPassword = await bcrypt.compare(
-      password,
-      findUser?.password!
+    const findUser = await userModel.findOne({ email });
+    const isValidPassword = await bcrypt.compare(password, findUser?.password!);
+
+    if (!findUser) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user does not exist",
+      });
+    }
+    if (!isValidPassword) {
+      return res.status(HTTP.OK).json({
+        message: "Creditianls is not authorized",
+      });
+    }
+
+    if (findUser.verified !== true) {
+      return res.status(HTTP.FORBIDDEN).json({
+        message: "This user is not verified",
+      });
+    }
+
+    const refreshToken = jwt.sign(
+      {
+        id: findUser.id,
+        email: findUser.email,
+        userName: findUser.userName,
+        verified: findUser.verified,
+      },
+      "veriedRefreshedUser",
+      { expiresIn: "2d" },
     );
 
-      if (!findUser ) {
-        return res.status(HTTP.FORBIDDEN).json({
-          message: "This user does not exist",
-        });
-      } 
-         if (!isValidPassword) {
-           return res.status(HTTP.OK).json({
-             message: "Creditianls is not authorized",
-           });
-         }
+    return res.status(HTTP.OK).json({
+      message: `Welcome back ${findUser.userName}`,
+      data: findUser,
+      token: refreshToken,
+    });
+    // const decryptPassword = await bcrypt.compare(
+    //   password,
+    //   findUser?.password!,
+    // );
 
-    if(findUser.verified !== true) { 
-      return res.status(HTTP.FORBIDDEN).json({
-        message:"This user is not verified",
-      })
-    }
- 
-          const refreshToken = jwt.sign(
-            {
-              id: findUser.id,
-              email: findUser.email,
-              userName: findUser.userName,
-              verified: findUser.verified,
-            },
-            "veriedRefreshedUser",
-            { expiresIn: "2m" },
-          );
+    // if (decryptPassword) {
+    //   const encrypt = jwt.sign(
+    //     {
+    //       id: findUser.id,
+    //     },
+    //     process.env.SIG_SECRET,
+    //     { expiresIn: process.env.SIG_EXPIRES },
+    //   );
 
-          return res.status(HTTP.OK).json({
-            message: `Welcome back ${findUser.userName}`,
-            data: findUser,
-            token: refreshToken
-          })
-            // const decryptPassword = await bcrypt.compare(
-        //   password,
-        //   findUser?.password!,
-        // );
-
-        // if (decryptPassword) {
-        //   const encrypt = jwt.sign(
-        //     {
-        //       id: findUser.id,
-        //     },
-        //     process.env.SIG_SECRET,
-        //     { expiresIn: process.env.SIG_EXPIRES },
-        //   );
-
-
-      // } else {
-      //   return res.status(HTTP.FORBIDDEN).json({
-      //     message: "This Account hasn't been Verified",
-      //   });
-      // }
+    // } else {
+    //   return res.status(HTTP.FORBIDDEN).json({
+    //     message: "This Account hasn't been Verified",
+    //   });
+    // }
   } catch (err) {
     new mainAppErrorHandler({
       message: `Unable to create school for Admin`,

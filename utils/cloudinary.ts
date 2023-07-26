@@ -1,5 +1,4 @@
-import cloud from "cloudinary";
-const cloudinary = cloud.v2;
+import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
   cloud_name: "newcodelabstudents24",
