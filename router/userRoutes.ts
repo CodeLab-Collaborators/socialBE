@@ -7,12 +7,12 @@ import {
   getOneUser,
   resetMail,
   signin,
-
   verifyUser,
   refreshUserToken,
   updateUserImage,
   editProfile,
   updateUser,
+  updateUserCoverImage,
 } from "../controller/UserController";
 import multer from "multer";
 let uploadData = multer();
@@ -25,20 +25,22 @@ router.route("/:id/get-one").get(getOneUser);
 
 router.route("/:id/image").patch(uploadData.single("avatar"), updateUserImage);
 
+router
+  .route("/:id/cover-image")
+  .patch(uploadData.single("avatar"), updateUserCoverImage);
+
 router.route("/:id/update-info").patch(updateUser);
-
-
 
 router.route("/:id/delete-account").delete(deleteUser);
 
-router.route("/create").post(createUser);
+router.route("/register").post(createUser);
 
 router.route("/:id/:token/verify").get(verifyUser);
 
 router.route("/reset-password").patch(resetMail);
 router.route("/:id/:token/change-password").patch(changePassword);
 
-router.route("/signin").post(signin);
+router.route("/sign-in").post(signin);
 router.route("/refresh-access-token").post(refreshUserToken);
 
 export default router;

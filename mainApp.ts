@@ -51,8 +51,9 @@ export const mainApp = (app: Application) => {
     // custom auth
     .use("/api/social/auth", user)
 
-    .use("/api/posts", userpost )
-  
+    // post data router
+    .use("/api/social/post", userpost)
+
     //oAuth with google
     .use("/", oAuth)
     .all("*", (req: Request, res: Response, next: NextFunction) => {

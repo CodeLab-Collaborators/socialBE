@@ -4,25 +4,42 @@ import { IpostData } from "../utils/interfaces/userInterface";
 interface Ipost extends IpostData, Document{}
 
 const postModel = new mongoose.Schema<IpostData>({
-  tittle: {
+  post: {
     type: String,
   },
-  content: {
+  userID: {
     type: String,
   },
+
   mediaFile: {
     type: String,
+  },
+
+  user: 
+    {
+    type: Schema.Types.ObjectId,
+    ref: "users",
+  }
+,
+  hashtag:[
+
+  mediaFileID: {
+    type: String,
+  },
+  like: {
+    type: [],
   },
   user: {
     type: Schema.Types.ObjectId,
     ref: "users",
   },
-  hashtag:[
+  hashtag: [
+
     {
-        type:Schema.Types.ObjectId,
-        ref:"users"
-    }
-  ]
+      type: Schema.Types.ObjectId,
+      ref: "hashTags",
+    },
+  ],
 });
 
 export default mongoose.model<Ipost>("posts", postModel);
