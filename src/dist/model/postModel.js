@@ -34,21 +34,9 @@ const postModel = new mongoose_1.default.Schema({
     mediaFile: {
         type: String,
     },
-    mediaFileID: {
-        type: String,
-    },
-    like: {
-        type: [],
-    },
     user: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "users",
     },
-    hashtag: [
-        {
-            type: mongoose_1.Schema.Types.ObjectId,
-            ref: "hashTags",
-        },
-    ],
-});
+}, { timestamps: true });
 exports.default = mongoose_1.default.model("posts", postModel);

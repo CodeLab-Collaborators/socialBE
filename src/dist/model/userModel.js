@@ -64,19 +64,34 @@ const userModel = new mongoose_1.default.Schema({
     music: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
-        }
+        },
     ],
     church: {
-        type: String
+        type: String,
     },
     mosque: {
-        type: String
+        type: String,
     },
     post: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "posts",
-        }
-    ]
+        },
+    ],
+    friends: {
+        type: (Array),
+    },
+    mentor: {
+        type: (Array),
+    },
+    mentee: {
+        type: (Array),
+    },
+    followers: {
+        type: (Array),
+    },
+    followings: {
+        type: (Array),
+    },
 }, { timestamps: true });
 exports.default = mongoose_1.default.model("users", userModel);

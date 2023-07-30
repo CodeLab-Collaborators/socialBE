@@ -24,8 +24,16 @@ const errorDefiner_1 = require("../error/errorDefiner");
 const streamifier_1 = __importDefault(require("streamifier"));
 //getting all user 
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        // const token = req.headers.authorization?.split(" ")[1];
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+        // checking for the authorization token
+        if (!token) {
+            return res.status(HTTP_1.HTTP.OK).json({
+                message: "Invalid Token",
+            });
+        }
+        //const decodedToken = jwt.verify(token, "veriedRefreshedUser");
         // if (!token) {
         //   return res.status(HTTP.OK).json({
         //     message: 'Invalid Token',
@@ -93,7 +101,7 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         new errorDefiner_1.mainAppErrorHandler({
             message: `Unable to create user`,
             status: HTTP_1.HTTP.BAD_REQUEST,
-            name: "remoev user Error",
+            name: "remove user Error",
             isSuccess: false,
         });
         return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
@@ -285,7 +293,7 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const { fullName, userName, email, password } = req.body;
         const tokenData = crypto_1.default.randomBytes(16).toString("hex");
-        console.log(tokenData);
+        // console.log(tokenData);
         const checkIfExist = yield userModel_1.default.findOne({ email });
         if (checkIfExist) {
             return res.status(HTTP_1.HTTP.FORBIDDEN).json({

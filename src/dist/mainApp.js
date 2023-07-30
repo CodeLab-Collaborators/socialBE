@@ -12,6 +12,11 @@ const errorDefiner_1 = require("./error/errorDefiner");
 const HTTP_1 = require("./constants/HTTP");
 const errorHandlers_1 = require("./error/errorHandlers");
 const userRoutes_1 = __importDefault(require("./router/userRoutes"));
+const friendRoute_1 = __importDefault(require("./router/friendRoute"));
+const followRouter_1 = __importDefault(require("./router/followRouter"));
+const mentorRouter_1 = __importDefault(require("./router/mentorRouter"));
+const chatRouter_1 = __importDefault(require("./router/chatRouter"));
+const chatMessageRouter_1 = __importDefault(require("./router/chatMessageRouter"));
 const postRouter_1 = __importDefault(require("./router/postRouter"));
 const oAuthRouter_1 = __importDefault(require("./router/oAuthRouter"));
 const morgan_1 = __importDefault(require("morgan"));
@@ -52,6 +57,16 @@ const mainApp = (app) => {
     })
         // custom auth
         .use("/api/social/auth", userRoutes_1.default)
+        // friends data router
+        .use("/api/social/friend", friendRoute_1.default)
+        // follow data router
+        .use("/api/social/follow", followRouter_1.default)
+        // chat data router
+        .use("/api/social/chat", chatRouter_1.default)
+        // chat data router
+        .use("/api/social/message", chatMessageRouter_1.default)
+        // mentor data router
+        .use("/api/social/mentor", mentorRouter_1.default)
         // post data router
         .use("/api/social/post", postRouter_1.default)
         //oAuth with google
