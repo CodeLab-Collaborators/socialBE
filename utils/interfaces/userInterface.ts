@@ -47,6 +47,11 @@ export interface iSocialUser {
   primarySchool?: string;
   post?: {}[];
   music?: string[];
+  friends?: string[];
+  mentor?: string[];
+  mentee?: string[];
+  followers?: string[];
+  followings?: string[];
 }
 
 export type iSocialUserData<Type> = {

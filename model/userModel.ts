@@ -73,26 +73,45 @@ const userModel = new mongoose.Schema<iSocialUser>(
       type: Array,
     },
     primarySchool: {
-      type:String,
+      type: String,
     },
-    music:[
+    music: [
       {
-        type:mongoose.Schema.Types.ObjectId,
-      }
+        type: mongoose.Schema.Types.ObjectId,
+      },
     ],
-    church:{
-      type:String
+    church: {
+      type: String,
     },
-    mosque:{
-    type:String
+    mosque: {
+      type: String,
     },
-    post:[
+    post: [
       {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"posts",
-      }
-    ]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "posts",
+      },
+    ],
 
+    friends: {
+      type: Array<String>,
+    },
+
+    mentor: {
+      type: Array<String>,
+    },
+
+    mentee: {
+      type: Array<String>,
+    },
+
+    followers: {
+      type: Array<String>,
+    },
+
+    followings: {
+      type: Array<String>,
+    },
   },
   { timestamps: true },
 );

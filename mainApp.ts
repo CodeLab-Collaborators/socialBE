@@ -6,9 +6,12 @@ import { mainAppErrorHandler } from "./error/errorDefiner";
 import { HTTP } from "./constants/HTTP";
 import { errorHandler } from "./error/errorHandlers";
 import user from "./router/userRoutes";
-import userpost from "./router/postRouter"
+import friend from "./router/friendRoute";
+import follow from "./router/followRouter";
+import mentor from "./router/mentorRouter";
+import userpost from "./router/postRouter";
 import oAuth from "./router/oAuthRouter";
-import morgan from "morgan"
+import morgan from "morgan";
 
 export const mainApp = (app: Application) => {
   app
@@ -50,6 +53,15 @@ export const mainApp = (app: Application) => {
     })
     // custom auth
     .use("/api/social/auth", user)
+
+    // friends data router
+    .use("/api/social/friend", friend)
+
+    // follow data router
+    .use("/api/social/follow", follow)
+
+    // mentor data router
+    .use("/api/social/mentor", mentor)
 
     // post data router
     .use("/api/social/post", userpost)

@@ -16,19 +16,17 @@ export const getUser = async (
   res: Response,
 ): Promise<Response> => {
   try {
-    // const token = req.headers.authorization?.split(" ")[1];
+    const token = req.headers.authorization?.split(" ")[1];
 
+    // checking for the authorization token
 
-const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(HTTP.OK).json({
+        message: "Invalid Token",
+      });
+    }
 
-//checking for the authorization token
-if (!token) {
-  return res.status(HTTP.OK).json({
-    message: 'Invalid Token',
-  });
-}
-
-//const decodedToken = jwt.verify(token, "veriedRefreshedUser");
+    //const decodedToken = jwt.verify(token, "veriedRefreshedUser");
 
     // if (!token) {
     //   return res.status(HTTP.OK).json({
@@ -37,7 +35,6 @@ if (!token) {
     // }
 
     //const decodedToken = jwt.verify(token, "veriedRefreshedUser");
-
 
     // return res.status(HTTP.OK).json({
     //   success: true,

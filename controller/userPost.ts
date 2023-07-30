@@ -108,6 +108,7 @@ export const getSingleUserPost = async (
     });
   }
 };
+
 //delete users' post
 export const deleteUserPosts = async (
   req: Request,
