@@ -74,3 +74,16 @@ export interface iHash {
   userID: string;
   post: {};
 } 
+
+
+
+export interface iChat {
+  member: string[];
+}
+
+export interface iChatMessage {
+  userID?: string;
+  chatID?: string;
+  message?: string;
+}
+

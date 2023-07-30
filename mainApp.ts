@@ -9,6 +9,8 @@ import user from "./router/userRoutes";
 import friend from "./router/friendRoute";
 import follow from "./router/followRouter";
 import mentor from "./router/mentorRouter";
+import chat from "./router/chatRouter";
+import chatMessage from "./router/chatMessageRouter";
 import userpost from "./router/postRouter";
 import oAuth from "./router/oAuthRouter";
 import morgan from "morgan";
@@ -59,6 +61,12 @@ export const mainApp = (app: Application) => {
 
     // follow data router
     .use("/api/social/follow", follow)
+
+    // chat data router
+    .use("/api/social/chat", chat)
+
+    // chat data router
+    .use("/api/social/message", chatMessage)
 
     // mentor data router
     .use("/api/social/mentor", mentor)
