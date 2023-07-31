@@ -92,13 +92,13 @@ export const getUserFriendPosts = async (
       return friend.friends.includes(userID);
     }
 
-    const matchedPosts = posted.filter((post) => getFriendPost(post.userID));
-    
+    const result = posted.filter((el) => friend.friends.includes(el.userID));
+
     return res.status(HTTP.OK).json({
-      message: `Gotten all my friends posts`,
-      data: matchedPosts,
+      message: `Got all my friends posts`,
+      data: result,
     });
-    
+
   } catch (error:any) {
     new mainAppErrorHandler({
       message: "Unable to get all post",

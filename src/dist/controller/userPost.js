@@ -91,10 +91,10 @@ const getUserFriendPosts = (req, res) => __awaiter(void 0, void 0, void 0, funct
         function getFriendPost(userID) {
             return friend.friends.includes(userID);
         }
-        const matchedPosts = posted.filter((post) => getFriendPost(post.userID));
+        const result = posted.filter((el) => friend.friends.includes(el.userID));
         return res.status(HTTP_1.HTTP.OK).json({
-            message: `Gotten all my friends posts`,
-            data: matchedPosts,
+            message: `Got all my friends posts`,
+            data: result,
         });
     }
     catch (error) {
