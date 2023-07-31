@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unLikeUserPosts = exports.likeUserPosts = exports.deleteUserPost = exports.createPost = exports.deleteUserPosts = exports.getSingleUserPost = exports.getUserPosts = exports.getAllPost = void 0;
+exports.unLikeUserPosts = exports.likeUserPosts = exports.deleteUserPost = exports.createPost = exports.deleteUserPosts = exports.getSingleUserPost = exports.getUserFriendPosts = exports.getUserPosts = exports.getAllPost = void 0;
 const postModel_1 = __importDefault(require("../model/postModel"));
 const HTTP_1 = require("../constants/HTTP");
 const errorDefiner_1 = require("../error/errorDefiner");
@@ -75,6 +75,42 @@ const getUserPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getUserPosts = getUserPosts;
+//get users' post
+const getUserFriendPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userID } = req.params;
+        const friend = yield userModel_1.default.findById(userID).populate({
+            path: "friends",
+            options: {
+                sort: {
+                    createdAt: -1,
+                },
+            },
+        });
+        const posted = yield postModel_1.default.find();
+        function getFriendPost(userID) {
+            return friend.friends.includes(userID);
+        }
+        const matchedPosts = posted.filter((post) => getFriendPost(post.userID));
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: `Gotten all my friends posts`,
+            data: matchedPosts,
+        });
+    }
+    catch (error) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: "Unable to get all post",
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "User posting error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Error found",
+            data: error.message,
+        });
+    }
+});
+exports.getUserFriendPosts = getUserFriendPosts;
 //get all post 
 const getSingleUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -159,7 +195,6 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         //decrypting the token
         const requestUser = jsonwebtoken_1.default.verify(token, "veriedRefreshedUser");
         //tie the post to the user
-        const user = yield userModel_1.default.findById({ userID });
         if (!token) {
             return res.status(HTTP_1.HTTP.OK).json({
                 message: "Invalid Token",
@@ -186,7 +221,7 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 post,
                 mediaFile: image.secure_url,
                 mediaFileID: image.public_id,
-                userID: user._id,
+                userID: whoPosted._id,
                 user: whoPosted,
             });
             (_d = whoPosted.post) === null || _d === void 0 ? void 0 : _d.push(new mongoose_1.default.Types.ObjectId(creatingPost._id));

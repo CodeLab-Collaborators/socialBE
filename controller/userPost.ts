@@ -69,6 +69,51 @@ export const getUserPosts = async (
 };
 
 
+//get users' post
+export const getUserFriendPosts = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { userID } = req.params;
+
+    const friend: any = await userModel.findById(userID).populate({
+      path: "friends",
+      options: {
+        sort: {
+          createdAt: -1,
+        },
+      },
+    });
+
+    const posted = await postModel.find();
+        
+    function getFriendPost(userID: any) {
+      return friend.friends.includes(userID);
+    }
+
+    const matchedPosts = posted.filter((post) => getFriendPost(post.userID));
+    
+    return res.status(HTTP.OK).json({
+      message: `Gotten all my friends posts`,
+      data: matchedPosts,
+    });
+    
+  } catch (error:any) {
+    new mainAppErrorHandler({
+      message: "Unable to get all post",
+      status: HTTP.BAD_REQUEST,
+      name: "User posting error",
+      isSuccess: false,
+    });
+    return res.status(HTTP.OK).json({
+      message: "Error found",
+      data: error.message,
+    });
+  }
+};
+
+
 //get all post 
 export const getSingleUserPost = async (
   req: Request,
@@ -162,7 +207,7 @@ export const createPost = async (req: any, res: Response) => {
     const requestUser = jwt.verify(token, "veriedRefreshedUser");
 
     //tie the post to the user
-    const user = await userModel.findById({ userID });
+    
       if (!token) {
         return res.status(HTTP.OK).json({
           message: "Invalid Token",
@@ -194,7 +239,7 @@ export const createPost = async (req: any, res: Response) => {
 
           mediaFile: image.secure_url,
           mediaFileID: image.public_id,
-          userID: user!._id,
+          userID: whoPosted!._id,
           user: whoPosted,
         });
 

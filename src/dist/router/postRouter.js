@@ -10,6 +10,7 @@ let uploadData = (0, multer_1.default)();
 const router = (0, express_1.Router)();
 router.route("/get-posts").get(userPost_1.getAllPost);
 router.route("/:userID/get-post").get(userPost_1.getUserPosts);
+router.route("/:userID/get-friends-post").get(userPost_1.getUserFriendPosts);
 router.route("/:userID/:postID/delete-post").delete(userPost_1.deleteUserPosts);
 router
     .route("/:userID/make-post")
