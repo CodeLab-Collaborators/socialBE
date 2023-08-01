@@ -5,6 +5,9 @@ interface Ipost extends IpostData, Document{}
 
 const postModel = new mongoose.Schema<IpostData>(
   {
+    like: {
+      type: Array<String>,
+    },
     post: {
       type: String,
     },

@@ -24,22 +24,27 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const postModel = new mongoose_1.default.Schema({
-    like: {
-        type: (Array),
+const workAtModel = new mongoose_1.default.Schema({
+    workPlace: {
+        type: String,
     },
-    post: {
+    workLocation: {
+        type: String,
+    },
+    startedAt: {
+        type: String,
+    },
+    endsAt: {
         type: String,
     },
     userID: {
-        type: String,
-    },
-    mediaFile: {
         type: String,
     },
     user: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "users",
     },
-}, { timestamps: true });
-exports.default = mongoose_1.default.model("posts", postModel);
+}, {
+    timestamps: true,
+});
+exports.default = mongoose_1.default.model("works", workAtModel);

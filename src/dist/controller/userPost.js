@@ -75,7 +75,7 @@ const getUserPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getUserPosts = getUserPosts;
-//get users' post
+//get only friends' post
 const getUserFriendPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userID } = req.params;
@@ -88,9 +88,6 @@ const getUserFriendPosts = (req, res) => __awaiter(void 0, void 0, void 0, funct
             },
         });
         const posted = yield postModel_1.default.find();
-        function getFriendPost(userID) {
-            return friend.friends.includes(userID);
-        }
         const result = posted.filter((el) => friend.friends.includes(el.userID));
         return res.status(HTTP_1.HTTP.OK).json({
             message: `Got all my friends posts`,

@@ -69,7 +69,7 @@ export const getUserPosts = async (
 };
 
 
-//get users' post
+//get only friends' post
 export const getUserFriendPosts = async (
   req: Request,
   res: Response,
@@ -87,10 +87,7 @@ export const getUserFriendPosts = async (
     });
 
     const posted = await postModel.find();
-        
-    function getFriendPost(userID: any) {
-      return friend.friends.includes(userID);
-    }
+ 
 
     const result = posted.filter((el) => friend.friends.includes(el.userID));
 

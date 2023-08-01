@@ -8,8 +8,10 @@ import { errorHandler } from "./error/errorHandlers";
 import user from "./router/userRoutes";
 import friend from "./router/friendRoute";
 import follow from "./router/followRouter";
+import like from "./router/likeRouter";
 import mentor from "./router/mentorRouter";
 import chat from "./router/chatRouter";
+import work from "./router/workHistoryRouter";
 import chatMessage from "./router/chatMessageRouter";
 import userpost from "./router/postRouter";
 import oAuth from "./router/oAuthRouter";
@@ -59,8 +61,14 @@ export const mainApp = (app: Application) => {
     // friends data router
     .use("/api/social/friend", friend)
 
+    // work journey data router
+    .use("/api/social/work", work)
+
     // follow data router
     .use("/api/social/follow", follow)
+
+    // like data router
+    .use("/api/social/like", like)
 
     // chat data router
     .use("/api/social/chat", chat)

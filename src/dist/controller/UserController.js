@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.refreshUserToken = exports.changePassword = exports.resetMail = exports.verifyUser = exports.signin = exports.createUser = exports.updateUserCoverImage = exports.updateUserImage = exports.editProfile = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
+exports.musicUpdate = exports.bioUpdate = exports.professionalUpdate = exports.academicUpdate = exports.religiousUpdate = exports.updateLocation = exports.refreshUserToken = exports.changePassword = exports.resetMail = exports.verifyUser = exports.signin = exports.createUser = exports.updateUserCoverImage = exports.updateUserImage = exports.editProfile = exports.updateUser = exports.deleteUser = exports.getOneUser = exports.getUser = void 0;
 const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -578,3 +578,172 @@ const refreshUserToken = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.refreshUserToken = refreshUserToken;
+//editing the user location profile
+const updateLocation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { location, address, placeOfBirth, LGA, stateOfOrigin } = req.body;
+        const user = yield userModel_1.default.findByIdAndUpdate(id, {
+            location,
+            address,
+            placeOfBirth,
+            LGA,
+            stateOfOrigin,
+        }, { new: true });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Updating user's location info",
+            data: user,
+        });
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to update user`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "user update Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.updateLocation = updateLocation;
+//editing the user Religious profile
+const religiousUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { religion } = req.body;
+        const user = yield userModel_1.default.findByIdAndUpdate(id, {
+            religion,
+        }, { new: true });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Updating user's location info",
+            data: user,
+        });
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to update user`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "user update Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.religiousUpdate = religiousUpdate;
+//editing the user Academic profile
+const academicUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { primarySchool, secondarySchool, college } = req.body;
+        const user = yield userModel_1.default.findByIdAndUpdate(id, {
+            primarySchool,
+            secondarySchool,
+            college,
+        }, { new: true });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Updating user's academic info",
+            data: user,
+        });
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to update user`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "user update Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.academicUpdate = academicUpdate;
+//editing the user Professional profile
+const professionalUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { profession } = req.body;
+        const user = yield userModel_1.default.findByIdAndUpdate(id, {
+            profession,
+        }, { new: true });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Updating user's academic info",
+            data: user,
+        });
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to update user`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "user update Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.professionalUpdate = professionalUpdate;
+//editing the user Bio profile
+const bioUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { bio } = req.body;
+        const user = yield userModel_1.default.findByIdAndUpdate(id, {
+            bio,
+        }, { new: true });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Updating user's academic info",
+            data: user,
+        });
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to update user`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "user update Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.bioUpdate = bioUpdate;
+//editing the user music profile
+const musicUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    try {
+        const { id } = req.params;
+        const { music } = req.body;
+        const user = yield userModel_1.default.findById(id);
+        (_b = user === null || user === void 0 ? void 0 : user.music) === null || _b === void 0 ? void 0 : _b.push(...user === null || user === void 0 ? void 0 : user.music, music);
+        // user.save()
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Updating user's academic info",
+            data: user,
+        });
+    }
+    catch (err) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: `Unable to update user`,
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "user update Error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "Error Found",
+            data: err,
+        });
+    }
+});
+exports.musicUpdate = musicUpdate;

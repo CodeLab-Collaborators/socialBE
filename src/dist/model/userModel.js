@@ -63,19 +63,28 @@ const userModel = new mongoose_1.default.Schema({
     },
     music: [
         {
-            type: mongoose_1.default.Schema.Types.ObjectId,
+            type: (Array),
         },
     ],
-    church: {
+    religion: {
         type: String,
     },
-    mosque: {
+    LGA: {
+        type: String,
+    },
+    stateOfOrigin: {
         type: String,
     },
     post: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "posts",
+        },
+    ],
+    workAt: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "wroks",
         },
     ],
     friends: {

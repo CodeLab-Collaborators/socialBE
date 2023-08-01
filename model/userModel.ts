@@ -65,31 +65,49 @@ const userModel = new mongoose.Schema<iSocialUser>(
     verified: {
       type: Boolean,
     },
+
     bio: {
       type: String,
       default: "At School",
     },
+
     links: {
       type: Array,
     },
+
     primarySchool: {
       type: String,
     },
+
     music: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Array<String>,
       },
     ],
-    church: {
+
+    religion: {
       type: String,
     },
-    mosque: {
+
+    LGA: {
       type: String,
     },
+
+    stateOfOrigin: {
+      type: String,
+    },
+
     post: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "posts",
+      },
+    ],
+
+    workAt: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "wroks",
       },
     ],
 

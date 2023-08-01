@@ -692,3 +692,240 @@ export const refreshUserToken = async (req: Request, res: Response) => {
     console.log(error);
   }
 };
+
+
+//editing the user location profile
+export const updateLocation = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const {
+      
+      location,
+      address,
+      placeOfBirth,
+      LGA,
+      stateOfOrigin
+    } = req.body;
+
+    const user = await userModel.findByIdAndUpdate(
+      id,
+      {
+        location,
+        address,
+        placeOfBirth,
+        LGA,
+        stateOfOrigin,
+      },
+      { new: true },
+    );
+
+    return res.status(HTTP.OK).json({
+      message: "Updating user's location info",
+      data: user,
+    });
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to update user`,
+      status: HTTP.BAD_REQUEST,
+      name: "user update Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//editing the user Religious profile
+export const religiousUpdate = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const { religion } = req.body;
+
+    const user = await userModel.findByIdAndUpdate(
+      id,
+      {
+        religion,
+      },
+      { new: true },
+    );
+
+    return res.status(HTTP.OK).json({
+      message: "Updating user's location info",
+      data: user,
+    });
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to update user`,
+      status: HTTP.BAD_REQUEST,
+      name: "user update Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//editing the user Academic profile
+export const academicUpdate = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const {
+      primarySchool,
+      secondarySchool,
+      college
+    } = req.body;
+
+    const user = await userModel.findByIdAndUpdate(
+      id,
+      {
+        primarySchool,
+        secondarySchool,
+        college,
+      },
+      { new: true },
+    );
+
+    return res.status(HTTP.OK).json({
+      message: "Updating user's academic info",
+      data: user,
+    });
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to update user`,
+      status: HTTP.BAD_REQUEST,
+      name: "user update Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//editing the user Professional profile
+export const professionalUpdate = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const {
+      profession
+    } = req.body;
+
+    const user = await userModel.findByIdAndUpdate(
+      id,
+      {
+        profession,
+      },
+      { new: true },
+    );
+
+    return res.status(HTTP.OK).json({
+      message: "Updating user's academic info",
+      data: user,
+    });
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to update user`,
+      status: HTTP.BAD_REQUEST,
+      name: "user update Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//editing the user Bio profile
+export const bioUpdate = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const {
+      bio
+    } = req.body;
+
+    const user = await userModel.findByIdAndUpdate(
+      id,
+      {
+        bio,
+      },
+      { new: true },
+    );
+
+    return res.status(HTTP.OK).json({
+      message: "Updating user's academic info",
+      data: user,
+    });
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to update user`,
+      status: HTTP.BAD_REQUEST,
+      name: "user update Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
+
+//editing the user music profile
+export const musicUpdate = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const {
+      music
+    } = req.body;
+
+    const user = await userModel.findById(id)
+
+    user?.music?.push(...user?.music, music);
+    // user.save()
+
+    return res.status(HTTP.OK).json({
+      message: "Updating user's academic info",
+      data: user,
+    });
+  } catch (err) {
+    new mainAppErrorHandler({
+      message: `Unable to update user`,
+      status: HTTP.BAD_REQUEST,
+      name: "user update Error",
+      isSuccess: false,
+    });
+
+    return res.status(HTTP.BAD_REQUEST).json({
+      message: "Error Found",
+      data: err,
+    });
+  }
+};
