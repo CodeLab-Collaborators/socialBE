@@ -39,14 +39,21 @@ export interface iSocialUser {
   placeOfBirth?: string;
   college?: string;
   secondarySchool?: string;
-  church: string;
-  mosque: string;
+  religion: string;
+  LGA: string;
+  stateOfOrigin: string;
   bio?: [];
   links?: string[];
   location?: string;
   primarySchool?: string;
   post?: {}[];
   music?: string[];
+  friends?: string[];
+  mentor?: string[];
+  mentee?: string[];
+  followers?: string[];
+  followings?: string[];
+  workAt?: string[];
 }
 
 export type iSocialUserData<Type> = {
@@ -59,13 +66,32 @@ export interface IpostData {
   userID: string;
   mediaFile: string;
   mediaFileID: string;
-  like: string[];
+  like: any;
   hashtag: {}[];
-} 
+}
 
 export interface iHash {
   user: {};
   title: string;
   userID: string;
   post: {};
-} 
+}
+
+export interface iChat {
+  member: string[];
+}
+
+export interface iChatMessage {
+  userID?: string;
+  chatID?: string;
+  message?: string;
+}
+
+export interface iWork {
+  workPlace?: string;
+  workLocation?: string;
+  startedAt?: string;
+  endsAt?: string;
+  userID?: string;
+  user: {};
+}

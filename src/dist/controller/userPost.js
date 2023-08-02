@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unLikeUserPosts = exports.likeUserPosts = exports.createPost = exports.deleteUserPosts = exports.getUserPosts = exports.getAllPost = void 0;
+exports.unLikeUserPosts = exports.likeUserPosts = exports.deleteUserPost = exports.createPost = exports.deleteUserPosts = exports.getSingleUserPost = exports.getUserFriendPosts = exports.getUserPosts = exports.getAllPost = void 0;
 const postModel_1 = __importDefault(require("../model/postModel"));
 const HTTP_1 = require("../constants/HTTP");
 const errorDefiner_1 = require("../error/errorDefiner");
@@ -75,15 +75,84 @@ const getUserPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getUserPosts = getUserPosts;
+//get only friends' post
+const getUserFriendPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userID } = req.params;
+        const friend = yield userModel_1.default.findById(userID).populate({
+            path: "friends",
+            options: {
+                sort: {
+                    createdAt: -1,
+                },
+            },
+        });
+        const posted = yield postModel_1.default.find();
+        const result = posted.filter((el) => friend.friends.includes(el.userID));
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: `Got all my friends posts`,
+            data: result,
+        });
+    }
+    catch (error) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: "Unable to get all post",
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "User posting error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Error found",
+            data: error.message,
+        });
+    }
+});
+exports.getUserFriendPosts = getUserFriendPosts;
+//get all post 
+const getSingleUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        //get authorization
+        const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+        if (!token) {
+            return res.status(HTTP_1.HTTP.OK).json({
+                message: "Invalid Token",
+            });
+        }
+        //decrypting the token
+        const requestUser = jsonwebtoken_1.default.verify(token, "veriedRefreshedUser");
+        //knowing who is the user
+        const user = yield userModel_1.default.findOne({ email: requestUser.email });
+        //getting the post of that particular user
+        const posting = yield postModel_1.default.find({ user: user._id });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: `Gotten all ${posting.length} posts by ${user === null || user === void 0 ? void 0 : user.userName}`,
+            data: posting,
+        });
+    }
+    catch (error) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: "Unable to get all post",
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "User posting error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.OK).json({
+            message: "Error found",
+            data: error,
+        });
+    }
+});
+exports.getSingleUserPost = getSingleUserPost;
 //delete users' post
 const deleteUserPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _b;
     try {
         const { userID, postID } = req.params;
         const user = yield userModel_1.default.findById(userID);
         if (user) {
             yield postModel_1.default.findByIdAndDelete(postID);
-            (_a = user === null || user === void 0 ? void 0 : user.post) === null || _a === void 0 ? void 0 : _a.pull(new mongoose_1.default.Types.ObjectId(postID));
+            (_b = user === null || user === void 0 ? void 0 : user.post) === null || _b === void 0 ? void 0 : _b.pull(new mongoose_1.default.Types.ObjectId(postID));
             user.save();
             return res.status(HTTP_1.HTTP.CREATED).json({
                 message: `posts delete`,
@@ -110,59 +179,54 @@ const deleteUserPosts = (req, res) => __awaiter(void 0, void 0, void 0, function
 });
 exports.deleteUserPosts = deleteUserPosts;
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c;
+    var _c, _d;
     try {
         const { userID } = req.params;
-        const token = (_b = req.headers.authorization) === null || _b === void 0 ? void 0 : _b.split(" ")[1];
+        //get authorization
+        const token = (_c = req.headers.authorization) === null || _c === void 0 ? void 0 : _c.split(" ")[1];
         if (!token) {
             return res.status(HTTP_1.HTTP.OK).json({
                 message: "Invalid Token",
             });
         }
+        //decrypting the token
         const requestUser = jsonwebtoken_1.default.verify(token, "veriedRefreshedUser");
-        const { post } = req.body;
-        if (!req.body) {
-            return res.status(HTTP_1.HTTP.FORBIDDEN).json({
-                message: "This post can not be created",
+        //tie the post to the user
+        if (!token) {
+            return res.status(HTTP_1.HTTP.OK).json({
+                message: "Invalid Token",
             });
         }
-        else {
-            const whoPosted = yield userModel_1.default.findById(userID);
-            if (whoPosted) {
-                let streamUpload = (req) => __awaiter(void 0, void 0, void 0, function* () {
-                    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
-                        let stream = cloudinary_1.default.uploader.upload_stream((error, result) => {
-                            if (result) {
-                                return resolve(result);
-                            }
-                            else {
-                                return reject(error);
-                            }
-                        });
-                        streamifier_1.default.createReadStream(req.file.buffer).pipe(stream);
-                    }));
-                });
-                const image = yield streamUpload(req);
-                // const image: any = await cloudinary.uploader.upload(req.file.path);
-                const creatingPosting = yield postModel_1.default.create({
-                    post,
-                    mediaFile: image.secure_url,
-                    mediaFileID: image.public_id,
-                    userID: requestUser._id,
-                    user: whoPosted,
-                });
-                (_c = whoPosted.post) === null || _c === void 0 ? void 0 : _c.push(new mongoose_1.default.Types.ObjectId(creatingPosting._id));
-                whoPosted.save();
-                return res.status(HTTP_1.HTTP.CREATED).json({
-                    message: "your post has been created",
-                    data: creatingPosting,
-                });
-            }
-            else {
-                return res.status(404).json({
-                    message: "User not assigned",
-                });
-            }
+        const { post } = req.body;
+        const whoPosted = yield userModel_1.default.findById(userID);
+        if (whoPosted) {
+            let streamUpload = (req) => __awaiter(void 0, void 0, void 0, function* () {
+                return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+                    let stream = cloudinary_1.default.uploader.upload_stream((error, result) => {
+                        if (result) {
+                            return resolve(result);
+                        }
+                        else {
+                            return reject(error);
+                        }
+                    });
+                    streamifier_1.default.createReadStream(req.file.buffer).pipe(stream);
+                }));
+            });
+            const image = yield streamUpload(req);
+            const creatingPost = yield postModel_1.default.create({
+                post,
+                mediaFile: image.secure_url,
+                mediaFileID: image.public_id,
+                userID: whoPosted._id,
+                user: whoPosted,
+            });
+            (_d = whoPosted.post) === null || _d === void 0 ? void 0 : _d.push(new mongoose_1.default.Types.ObjectId(creatingPost._id));
+            whoPosted.save();
+            return res.status(HTTP_1.HTTP.CREATED).json({
+                message: "your post has been created",
+                data: creatingPost,
+            });
         }
     }
     catch (error) {
@@ -179,6 +243,50 @@ const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createPost = createPost;
+const deleteUserPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _e, _f;
+    try {
+        //get authorization
+        const token = (_e = req.headers.authorization) === null || _e === void 0 ? void 0 : _e.split(" ")[1];
+        if (!token) {
+            return res.status(HTTP_1.HTTP.OK).json({
+                message: "Invalid Token",
+            });
+        }
+        //decrypting the token
+        const requestUser = jsonwebtoken_1.default.verify(token, "veriedRefreshedUser");
+        //knowing who is the user
+        const user = yield userModel_1.default.findOne({ email: requestUser.email });
+        const { ID } = req.params;
+        const userPost = yield postModel_1.default.findById(ID);
+        if ((user === null || user === void 0 ? void 0 : user._id) === userPost.user) {
+            userPost === null || userPost === void 0 ? void 0 : userPost.deleteOne;
+            (_f = user === null || user === void 0 ? void 0 : user.post) === null || _f === void 0 ? void 0 : _f.pull(new mongoose_1.default.Types.ObjectId(userPost === null || userPost === void 0 ? void 0 : userPost._id));
+            user.save();
+            return res.json(HTTP_1.HTTP.OK).json({
+                message: "Your post have been  successfully deleted",
+            });
+        }
+        else {
+            return res.status(404).json({
+                message: "this action is not allowed",
+            });
+        }
+    }
+    catch (error) {
+        new errorDefiner_1.mainAppErrorHandler({
+            message: "Unable to delete te user post",
+            status: HTTP_1.HTTP.BAD_REQUEST,
+            name: "remove post error",
+            isSuccess: false,
+        });
+        return res.status(HTTP_1.HTTP.BAD_REQUEST).json({
+            message: "An error occurred while deleting",
+            data: error,
+        });
+    }
+});
+exports.deleteUserPost = deleteUserPost;
 //like users' post
 const likeUserPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

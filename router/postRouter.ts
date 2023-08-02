@@ -4,6 +4,7 @@ import {
   createPost,
   deleteUserPosts,
   getAllPost,
+  getUserFriendPosts,
   getUserPosts,
   likeUserPosts,
   unLikeUserPosts,
@@ -11,13 +12,13 @@ import {
 import multer from "multer";
 let uploadData = multer();
 
-
 const router = Router();
-
 
 router.route("/get-posts").get(getAllPost);
 
 router.route("/:userID/get-post").get(getUserPosts);
+
+router.route("/:userID/get-friends-post").get(getUserFriendPosts);
 
 router.route("/:userID/:postID/delete-post").delete(deleteUserPosts);
 
